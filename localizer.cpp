@@ -4,36 +4,54 @@
 #define MAX_PTS 2000 // nmax
 #define LOCAL_SAMPS 80 // (l) num local samples
 #define PLANE_SIZE .5 // S
-#define PLANE_OFFSET .02 // e
-#define MIN_INLIER .8 // alpha-in
-#define NEIGH_SIZE .5 // replaces Global_neigh
-#define GLOBAL_NEIGH 60 // n Neighborhood for global samples (in pixels) *** NOT USED ** 
+#define PLANE_OFFSET .05 // e
+#define MIN_INLIER .9 // alpha-in
+#define NEIGH_SIZE 1 // replaces Global_neigh
+// #define GLOBAL_NEIGH 60 // n Neighborhood for global samples (in pixels) *** NOT USED ** 
 
 using namespace std;
 using namespace pcl;
 
 
-PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud);
+void fspf();
+
 pcl::PointCloud<pcl::PointXYZ> my_cloud;
+PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud);
+
+PointCloud<PointXYZ> range;
+PointCloud<PointXYZ>::Ptr rangeptr(&range);
+
+pcl::PointCloud<PointXYZ> PlanePoints;
+pcl::PointCloud<PointXYZ> Outliers;  
 
 
 void pointcloudCallback(const sensor_msgs::PointCloud2 msg) { 
     cout << "inside callback" << endl;
-    
-    pcl::fromROSMsg(msg, my_cloud);
-    
-    // visualize(my_cloud);
-    cout << "HAI" << endl;
 
-    PointCloud<PointXYZ> filteredPoints = fspf(my_cloud);
-    cout << "K BAI" << endl;
-    visualize(filteredPoints);
+    // PointCloud<PointXYZ> cld;// = my_cloud;
+    pcl::fromROSMsg(msg, my_cloud);
+
+    // filter cloud to new smaller pointcloud
+
+    cout << "Old cloud size: " << my_cloud.size();
+
+    VoxelGrid<PointXYZ> sor;
+    sor.setInputCloud (my_cloud_ptr);
+    sor.setLeafSize (0.02, 0.02, 0.02);
+    sor.filter (my_cloud);
+
+    cout << "   New cloud size: " << my_cloud.size();
+
+    fspf();
+    cout << "     Filtered Cloud size: " << PlanePoints.size() << endl;
+    cout << "Outliers: " << Outliers.size() << endl;
+
+    visualize(PlanePoints);
 }
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "localizer");
     ros::NodeHandle nh;
-    cout << "hai" << endl;
     ros::Subscriber sub = nh.subscribe("/right_cloud_transform", 1, pointcloudCallback);
 
     cout << "inside of node" << endl;
@@ -42,30 +60,23 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
-    pcl::PointCloud<PointXYZ> PlanePoints;
-    pcl::PointCloud<PointXYZ> Outliers;
-    // pcl::KdTreeFLANN<pcl::PointXYZ> kdtree = pcl::KdTreeFLANN<pcl::PointXYZ>(cloud);
+void fspf() {
 
     int k = 0;
     int n = 0;
 
-    // new cloud that will shrink
-    PointCloud<PointXYZ> shrinkingCloud(cloud);
-
-
-    while (k < MAX_HOODS && n < MAX_PTS) {
+    while (k < MAX_HOODS && n < MAX_PTS) 
+    {
         k++;
-        int cloudsize = shrinkingCloud.size();
+        int cloudsize = my_cloud.size();
 
         // Organize cloudinto kdtree for nearest neighbor search
-        PointCloud<PointXYZ>::Ptr cloudptr(&shrinkingCloud);
         KdTreeFLANN<PointXYZ> kdtree;
-        kdtree.setInputCloud(cloudptr);
+        kdtree.setInputCloud(my_cloud_ptr);
 
         // get random point a
         int aindex = rand()%cloudsize;
-        PointXYZ a = cloud[aindex];
+        PointXYZ a = my_cloud[aindex];
 
         //RANSAC
         vector<float> pointRadiusSquaredDistance;
@@ -76,16 +87,16 @@ PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
 
         // filter range to new pointcloud
         ExtractIndices<PointXYZ> rangefilter;
-        rangefilter.setInputCloud(cloudptr);
+        rangefilter.setInputCloud(my_cloud_ptr);
         rangefilter.setIndices(rangeIndices);
         rangefilter.setNegative(false);
-        PointCloud<PointXYZ> range;
         rangefilter.filter(range);
 
         // create best plane pointcloud
         PointCloud<PointXYZ> BPP;
-        PointCloud<PointXYZ>::Ptr rangeptr(&range);
         vector<int> bestInliers;
+
+        if (range.size() < 1) { continue; }
         
         for (int i = 0; i < LOCAL_SAMPS; i++) {
             // pick 2 more points
@@ -97,17 +108,14 @@ PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
 
             // find points inliers
             vector<int> inlierIndices;
-            cout << "Range size: " << range.size() << endl;
             for (int j = 0; j < range.size(); j++) {
                 int currIndex = pointIdxRadiusSearch[j];
-                PointXYZ currpoint = shrinkingCloud[currIndex]; // make sure these are proper indices
+                PointXYZ currpoint = my_cloud[currIndex]; // make sure these are proper indices
                 float pdst = planeToPtDist(currpoint, a, norm);
                 if (pdst <= PLANE_OFFSET) {
                     inlierIndices.push_back(currIndex);
                 }
-                // cout << j;
             }
-            cout << "done" << endl;
 
             // is it better or worse than best
             if (inlierIndices.size() > numinliers) {
@@ -123,8 +131,6 @@ PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
                 bestInliers = inlierIndices;
                 numinliers = inlierIndices.size();
             }
-            cout << "!!!!!!" << k;
-
         }
 
         // add best inliers to Outliers or PlanePoints
@@ -137,13 +143,13 @@ PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
         
         // Extract possible points from shrinkingcloud
         ExtractIndices<PointXYZ> extract ; 
-        extract.setInputCloud (cloudptr);
+        extract.setInputCloud (my_cloud_ptr);
         boost::shared_ptr<vector<int> > bestInlierIndices(new vector<int> (bestInliers));
         extract.setIndices (bestInlierIndices);
         //extract.setNegative (false); //Removes part_of_cloud but retain the original full_cloud 
         extract.setNegative (true); // Removes part_of_cloud from full cloud  and keep the rest 
-        extract.filter (shrinkingCloud); 
+        extract.filter (my_cloud);
     }
 
-    return PlanePoints;
+    // return PlanePoints;
 }
