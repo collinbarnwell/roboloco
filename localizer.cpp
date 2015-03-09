@@ -13,38 +13,36 @@ using namespace std;
 using namespace pcl;
 
 
-PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud);
+void fspf(pcl::PointCloud<pcl::PointXYZ> cloud);
+pcl::PointCloud<pcl::PointXYZ> my_cloud;
 
 
 void pointcloudCallback(const sensor_msgs::PointCloud2 msg) { 
-    cout << "inside callback" << endl; 
-    pcl::PointCloud<pcl::PointXYZ> cloud;
-    pcl::fromROSMsg(msg, cloud);
-    visualize(cloud);
-    cout << "HAI" << endl;
+    cout << "inside callback" << endl;
+    
+    // pcl::fromROSMsg(msg, my_cloud);
+    
+    // // visualize(my_cloud);
+    // cout << "HAI" << endl;
 
-    PointCloud<PointXYZ> filteredPoints = fspf(cloud);
-    cout << "K BAI" << endl;
-    visualize(filteredPoints);
+    // PointCloud<PointXYZ> filteredPoints = fspf(my_cloud);
+    // cout << "K BAI" << endl;
+    // visualize(filteredPoints);
 }
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "localizer");
     ros::NodeHandle nh;
+    cout << "hai" << endl;
     ros::Subscriber sub = nh.subscribe("/right_cloud_transform", 1, pointcloudCallback);
 
-
-
-
     cout << "inside of node" << endl;
-
-
     
     ros::spin();
     return 0;
 }
 
-PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
+void fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
     pcl::PointCloud<PointXYZ> PlanePoints;
     pcl::PointCloud<PointXYZ> Outliers;
     // pcl::KdTreeFLANN<pcl::PointXYZ> kdtree = pcl::KdTreeFLANN<pcl::PointXYZ>(cloud);
@@ -143,6 +141,5 @@ PointCloud<PointXYZ> fspf(pcl::PointCloud<pcl::PointXYZ> cloud) {
         extract.filter (shrinkingCloud); 
     }
 
-    return PlanePoints;
+    // return PlanePoints;
 }
-
