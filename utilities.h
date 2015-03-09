@@ -13,7 +13,7 @@
 #include <pcl/filters/extract_indices.h>
 #include <pcl/point_types.h>
 #include <pcl/features/normal_3d.h>
- // #include <pcl/visualization/cloud_viewer.h>
+#include <pcl/visualization/cloud_viewer.h>
 
 using namespace std;
 using namespace pcl;
@@ -58,11 +58,10 @@ float planeToPtDist(PointXYZ currpoint, PointXYZ a, Normal norm) {
     return abs(dotpn(planeToPoint, norm));
 }
 
-// void visualize(PointCloud<PointXYZ> cloud) {
-//     visualization::CloudViewer viewer ("Simple Cloud Viewer");
-//     PointCloud<PointXYZ>::Ptr cloudptr(&cloud);
-//     viewer.showCloud (cloudptr);
-//     while (!viewer.wasStopped ())
-//     {
-//     }
-// }
+void visualize(PointCloud<PointXYZ> cloud) {
+    visualization::CloudViewer viewer ("Simple Cloud Viewer");
+    PointCloud<PointXYZ>::Ptr cloudptr(&cloud);
+    viewer.showCloud (cloudptr);
+    while (!viewer.wasStopped ()) {
+    }
+}
