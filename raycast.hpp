@@ -21,7 +21,7 @@ struct PointSorter {
 };
 
 
-void TrimOcclusion(PointXY x, Line occludee, Line occluder, vector<Line> lineList) {
+void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineList) {
     if (occluder.isZero()) return;
 
     vector<PointXY> pois;

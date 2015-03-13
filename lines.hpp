@@ -33,7 +33,7 @@ Line::Line(PointXY s, PointXY e) {
 void Line::print() {
     cout << "start: " << start.x << "," << start.y 
         << "  end: " << end.x << "," << end.y 
-        << "is_zero: " << is_zero << endl;
+        << "  is_zero: " << is_zero << endl;
 }
 
 PointXY Line::getStart() {
@@ -62,16 +62,25 @@ void Line::set_to_zero() {
 
 bool Line::intersect(Line l, PointXY* intersection) {
     float slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
-    float slopeme = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
+    float slopeme = (end.y - start.y)/(end.x - start.x);
     
     float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
     
-    if (x > start.x && x < end.x && x > l.getStart().x && x < l.getEnd().x) 
+    bool within_l = ((x > l.getStart().x && x < l.getEnd().x) || (x < l.getStart().x && x > l.getEnd().x));
+    bool within_self = ((x > start.x && x < end.x) || (x < start.x && x > end.x));
+
+    if (within_self && within_l)
     {
         PointXY p;
         p.x = x;
         p.y = slopeme*(x - start.x) + start.y;
         *intersection = p;
+
+        cout << "INTERSECTION DETECTED (self, l): " << endl;
+        print();
+        l.print();
+        cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
+
         return true;
     }
     else {
@@ -79,18 +88,27 @@ bool Line::intersect(Line l, PointXY* intersection) {
     }
 }
 
+// test if intersects with l, even if intersection is outside of self
 bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
     float slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
-    float slopeme = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
+    float slopeme = (end.y - start.y)/(end.x - start.x);
     
     float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
     
-    if (x > start.x && x < end.x) 
+    bool within_l = ((x > l.getStart().x && x < l.getEnd().x) || (x < l.getStart().x && x > l.getEnd().x));
+    
+    if (within_l)
     {
         PointXY p;
         p.x = x;
         p.y = slopeme*(x - start.x) + start.y;
         *intersection = p;
+
+        cout << "INTERSECTION (out of bound) DETECTED (self, l): " << endl;
+        print();
+        l.print();
+        cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
+
         return true;
     }
     else {
