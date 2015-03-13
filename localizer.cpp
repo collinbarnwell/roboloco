@@ -1,8 +1,19 @@
 // #ifndef HEADERFILE_H
 // #define LOCALIZER_H
 
-#include "utilities.hpp"
-#include "lines.hpp"
+// #include "raycast.hpp"
+#include "basic_utilities.hpp"
+#include "my_viz.hpp"
+
+#include <sensor_msgs/PointCloud2.h>
+#include <ros/console.h>
+#include "pcl/pcl_base.h"
+#include "pcl/PointIndices.h"
+#include "pcl/conversions.h"
+#include "pcl/common/impl/io.hpp"
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/filters/extract_indices.h>
+#include <pcl/filters/voxel_grid.h>
 
 #define MAX_HOODS 30000 // kmax
 #define MAX_PTS 20000 // nmax

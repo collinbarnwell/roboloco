@@ -1,23 +1,12 @@
-#ifndef YOOTILITEES
-#define YOOTILITEES
+#ifndef BASIC_YOOTS
+#define BASIC_YOOTS
 
+#include <ros/ros.h>
+#include <pcl_ros/point_cloud.h>
 #include <cmath>
 #include <vector>
-#include <ros/ros.h>
-#include <ros/console.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <pcl_ros/point_cloud.h>
-#include <pcl/point_types.h>
-#include "pcl/pcl_base.h"
-#include "pcl/PointIndices.h"
-#include "pcl/conversions.h"
-#include "pcl/common/impl/io.hpp"
-#include <pcl/kdtree/kdtree_flann.h>
-#include <pcl/filters/extract_indices.h>
 #include <pcl/point_types.h>
 #include <pcl/features/normal_3d.h>
-#include <pcl/visualization/cloud_viewer.h>
-#include <pcl/filters/voxel_grid.h>
 
 using namespace std;
 using namespace pcl;
@@ -60,22 +49,6 @@ float dotpn(PointXYZ a, Normal b) {
 float planeToPtDist(PointXYZ currpoint, PointXYZ a, Normal norm) {
     PointXYZ planeToPoint = PointXYZ(a.x - currpoint.x, a.y - currpoint.y, a.z - currpoint.z);
     return abs(dotpn(planeToPoint, norm));
-}
-
-void visualize1(PointCloud<PointXYZ> cloud) {
-    visualization::CloudViewer viewer ("Simple Cloud Viewer 1");
-    PointCloud<PointXYZ>::Ptr cloudptr(&cloud);
-    viewer.showCloud (cloudptr);
-    while (!viewer.wasStopped ()) {
-    }
-}
-
-void visualize2(PointCloud<PointXYZ> cloud) {
-    visualization::CloudViewer viewer ("Simple Cloud Viewer 2");
-    PointCloud<PointXYZ>::Ptr cloudptr(&cloud);
-    viewer.showCloud (cloudptr);
-    while (!viewer.wasStopped ()) {
-    }
 }
 
 #endif
