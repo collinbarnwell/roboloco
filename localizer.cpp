@@ -1,12 +1,17 @@
-#include "utilities.h"
+// #ifndef HEADERFILE_H
+// #define LOCALIZER_H
 
-#define MAX_HOODS 20000 // kmax
-#define MAX_PTS 2000 // nmax
+#include "utilities.hpp"
+#include "lines.hpp"
+
+#define MAX_HOODS 30000 // kmax
+#define MAX_PTS 20000 // nmax
 #define LOCAL_SAMPS 80 // (l) num local samples
-#define PLANE_SIZE .5 // S
-#define PLANE_OFFSET .05 // e
+// #define PLANE_SIZE .5 // S
+#define PLANE_OFFSET .03 // e
 #define MIN_INLIER .9 // alpha-in
-#define NEIGH_SIZE 1 // replaces Global_neigh
+#define NEIGH_SIZE .25 // replaces Global_neigh
+#define NEIGH_DENSITY 20
 // #define GLOBAL_NEIGH 60 // n Neighborhood for global samples (in pixels) *** NOT USED ** 
 
 using namespace std;
@@ -27,9 +32,13 @@ pcl::PointCloud<PointXYZ> Outliers;
 
 void pointcloudCallback(const sensor_msgs::PointCloud2 msg) { 
     cout << "inside callback" << endl;
+    PlanePoints.clear();
+    Outliers.clear();
 
     // PointCloud<PointXYZ> cld;// = my_cloud;
     pcl::fromROSMsg(msg, my_cloud);
+
+    // visualize1(my_cloud);
 
     // filter cloud to new smaller pointcloud
 
@@ -46,7 +55,7 @@ void pointcloudCallback(const sensor_msgs::PointCloud2 msg) {
     cout << "     Filtered Cloud size: " << PlanePoints.size() << endl;
     cout << "Outliers: " << Outliers.size() << endl;
 
-    visualize(PlanePoints);
+    visualize2(PlanePoints);
 }
 
 int main(int argc, char** argv) {
@@ -82,7 +91,9 @@ void fspf() {
         vector<float> pointRadiusSquaredDistance;
         vector<int> pointIdxRadiusSearch;
         int numinliers = 0;
-        int numsearch = kdtree.radiusSearch(a, NEIGH_SIZE, pointIdxRadiusSearch, pointRadiusSquaredDistance);
+        kdtree.radiusSearch(a, NEIGH_SIZE, pointIdxRadiusSearch, pointRadiusSquaredDistance);
+        int numsearch = pointIdxRadiusSearch.size();
+        // cout << numsearch << endl;
         boost::shared_ptr<vector<int> > rangeIndices (new vector<int> (pointIdxRadiusSearch));
 
         // filter range to new pointcloud
@@ -96,7 +107,7 @@ void fspf() {
         PointCloud<PointXYZ> BPP;
         vector<int> bestInliers;
 
-        if (range.size() < 1) { continue; }
+        if (range.size() < NEIGH_DENSITY) { continue; }
         
         for (int i = 0; i < LOCAL_SAMPS; i++) {
             // pick 2 more points
@@ -150,6 +161,4 @@ void fspf() {
         extract.setNegative (true); // Removes part_of_cloud from full cloud  and keep the rest 
         extract.filter (my_cloud);
     }
-
-    // return PlanePoints;
 }

@@ -1,3 +1,6 @@
+#ifndef YOOTILITEES
+#define YOOTILITEES
+
 #include <cmath>
 #include <vector>
 #include <ros/ros.h>
@@ -59,10 +62,20 @@ float planeToPtDist(PointXYZ currpoint, PointXYZ a, Normal norm) {
     return abs(dotpn(planeToPoint, norm));
 }
 
-void visualize(PointCloud<PointXYZ> cloud) {
-    visualization::CloudViewer viewer ("Simple Cloud Viewer");
+void visualize1(PointCloud<PointXYZ> cloud) {
+    visualization::CloudViewer viewer ("Simple Cloud Viewer 1");
     PointCloud<PointXYZ>::Ptr cloudptr(&cloud);
     viewer.showCloud (cloudptr);
     while (!viewer.wasStopped ()) {
     }
 }
+
+void visualize2(PointCloud<PointXYZ> cloud) {
+    visualization::CloudViewer viewer ("Simple Cloud Viewer 2");
+    PointCloud<PointXYZ>::Ptr cloudptr(&cloud);
+    viewer.showCloud (cloudptr);
+    while (!viewer.wasStopped ()) {
+    }
+}
+
+#endif
