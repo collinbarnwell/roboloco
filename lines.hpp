@@ -1,10 +1,14 @@
 #ifndef LINES_N_STUFF
 #define LINES_N_STUFF
 
+#define INF 16384
+
 #include "basic_utilities.hpp"
+#include <cmath>
 
 using namespace std;
 using namespace pcl;
+
 
 class Line {
     public:
@@ -18,6 +22,8 @@ class Line {
         bool isZero();
         void set_to_zero();
         void print();
+        float lengthSqd();
+        void checkLength();
     private:
         PointXY start;
         PointXY end;
@@ -28,6 +34,17 @@ Line::Line(PointXY s, PointXY e) {
     start = s;
     end = e;
     is_zero = false;
+    checkLength();
+}
+
+void Line::checkLength() {
+    if (lengthSqd() <= .01*.01) {
+        is_zero = true;
+    }
+}
+
+float Line::lengthSqd() {
+    return (start.x-end.x)*(start.x-end.x) + (start.y-end.y)*(start.y-end.y);
 }
 
 void Line::print() {
@@ -42,6 +59,7 @@ PointXY Line::getStart() {
 
 void Line::setStart(PointXY s) {
     start = s;
+    checkLength();
 }
 
 PointXY Line::getEnd() {
@@ -50,6 +68,7 @@ PointXY Line::getEnd() {
 
 void Line::setEnd(PointXY e) {
     end = e;
+    checkLength();
 }
 
 bool Line::isZero() {
@@ -61,13 +80,26 @@ void Line::set_to_zero() {
 }
 
 bool Line::intersect(Line l, PointXY* intersection) {
-    float slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
-    float slopeme = (end.y - start.y)/(end.x - start.x);
+    if (l.isZero() || isZero()) return false;
+
+    float slopeme, slopel;
+
+    if ((l.getEnd().x - l.getStart().x) == 0) {
+        slopel = (l.getEnd().y - l.getStart().y)*INF;
+    } else {
+        slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
+    }
+
+    if ((end.x - start.x) == 0) {
+        slopeme = (end.y - start.y)*INF;
+    } else {
+        slopeme = (end.y - start.y)/(end.x - start.x);
+    }
     
     float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
-    
-    bool within_l = ((x > l.getStart().x && x < l.getEnd().x) || (x < l.getStart().x && x > l.getEnd().x));
-    bool within_self = (x > start.x && x < end.x) || (x < start.x && x > end.x);
+
+    bool within_l = ((x >= l.getStart().x && x <= l.getEnd().x) || (x <= l.getStart().x && x >= l.getEnd().x));
+    bool within_self = (x >= start.x && x <= end.x) || (x <= start.x && x >= end.x);
 
     if (within_self && within_l)
     {
@@ -90,15 +122,31 @@ bool Line::intersect(Line l, PointXY* intersection) {
 
 // test if intersects with l, even if intersection is outside of self
 bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
-    float slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
-    float slopeme = (end.y - start.y)/(end.x - start.x);
-    
+    if (l.isZero() || isZero()) return false;
+
+    float slopeme, slopel;
+
+    if ((l.getEnd().x - l.getStart().x) == 0) {
+        slopel = (l.getEnd().y - l.getStart().y)*INF;
+    } else {
+        slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
+    }
+
+    if ((end.x - start.x) == 0) {
+        slopeme = (end.y - start.y)*INF;
+    } else {
+        slopeme = (end.y - start.y)/(end.x - start.x);
+    }
+
     float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
     
-    bool within_l = ((x > l.getStart().x && x < l.getEnd().x) || (x < l.getStart().x && x > l.getEnd().x));
-    bool within_self = (x > start.x && x < end.x) || (x < start.x && x > end.x);
+    bool within_l = ((x >= l.getStart().x && x <= l.getEnd().x) || (x <= l.getStart().x && x >= l.getEnd().x));
+    within_l = within_l || veryCloseTo(x, l.getStart().x) || veryCloseTo(x, l.getEnd().x);
 
-    if (within_l && !within_self)
+    bool not_within_self = (x >= start.x && x >= end.x) || (x <= start.x && x <= end.x);
+    not_within_self = not_within_self || veryCloseTo(x, end.x) || veryCloseTo(x, start.x);
+
+    if (within_l && not_within_self)
     {
         PointXY p;
         p.x = x;

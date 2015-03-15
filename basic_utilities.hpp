@@ -1,6 +1,8 @@
 #ifndef BASIC_YOOTS
 #define BASIC_YOOTS
 
+#define INF 16384
+
 #include <ros/ros.h>
 #include <pcl_ros/point_cloud.h>
 #include <cmath>
@@ -49,6 +51,14 @@ float dotpn(PointXYZ a, Normal b) {
 float planeToPtDist(PointXYZ currpoint, PointXYZ a, Normal norm) {
     PointXYZ planeToPoint = PointXYZ(a.x - currpoint.x, a.y - currpoint.y, a.z - currpoint.z);
     return abs(dotpn(planeToPoint, norm));
+}
+
+bool veryCloseTo(float a, float b) {
+    if (abs(a - b) <= 4/INF) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
