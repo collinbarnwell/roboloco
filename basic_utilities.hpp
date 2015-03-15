@@ -51,4 +51,5 @@ float planeToPtDist(PointXYZ currpoint, PointXYZ a, Normal norm) {
     return abs(dotpn(planeToPoint, norm));
 }
 
+
 #endif

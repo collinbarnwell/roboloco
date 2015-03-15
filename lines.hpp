@@ -117,19 +117,4 @@ bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
 }
 
 
-
-//******************
-//******************
-//******************
-
-// class LineList {
-//     public:
-//         void addLine(Line l);
-//         void removeLine(Line l);
-//         void mergeList(LineList l);
-//     private:
-//         vector<Line> list;
-// };
-
-
 #endif

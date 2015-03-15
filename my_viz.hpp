@@ -22,4 +22,5 @@ void visualize2(PointCloud<PointXYZ> cloud) {
     }
 }
 
+
 #endif

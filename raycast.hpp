@@ -88,14 +88,14 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
 }
 
 
-void AnalyticRayCast() {
+void AnalyticRayCast(vector<Line> input, vector<Line> &output) {
 
 
 
 
 
 
-
+    return;
 }
 
 

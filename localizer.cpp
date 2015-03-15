@@ -1,4 +1,4 @@
-// #ifndef HEADERFILE_H
+// #ifndef LOCALIZER_H
 // #define LOCALIZER_H
 
 // #include "raycast.hpp"
