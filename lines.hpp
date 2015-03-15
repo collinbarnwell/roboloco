@@ -96,8 +96,9 @@ bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
     float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
     
     bool within_l = ((x > l.getStart().x && x < l.getEnd().x) || (x < l.getStart().x && x > l.getEnd().x));
-    
-    if (within_l)
+    bool not_within_self = !((x > start.x && x < end.x) || (x < start.x && x > end.x));
+
+    if (within_l && not_within_self)
     {
         PointXY p;
         p.x = x;

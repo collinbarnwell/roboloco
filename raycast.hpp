@@ -88,7 +88,7 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
 }
 
 
-void AnalyticRayCast(PointXY x, vector<Line> map, vector<Line> &L) {
+void AnalyticRayCast(PointXY x, vector<Line> map, vector<Line> &L) { // untested
     for(vector<Line>::size_type i = 0; i != map.size(); i++) 
     {
         Line currentLine = map[i];
