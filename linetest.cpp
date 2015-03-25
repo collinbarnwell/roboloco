@@ -28,7 +28,6 @@ int main(int argc, char** argv) {
 
     Line occludee(eestart, eeend);
 
-
     eye.x = 0.0;
     eye.y = 0.0;
 
