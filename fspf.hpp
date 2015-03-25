@@ -1,6 +1,8 @@
 #ifndef FSPF_FXN
 #define FSPF_FXN
 
+#include <unordered_map>
+
 #include <sensor_msgs/PointCloud2.h>
 #include <ros/console.h>
 #include "pcl/pcl_base.h"
@@ -29,7 +31,11 @@ using namespace pcl;
 
 
 
-PointCloud<PointXYZ> fspf() {
+PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud, unordered_map<PointXYZ, Normal> &my_normals) {
+    unordered_map<PointXYZ, Normal> normals;
+
+    PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud);
+
     PointCloud<PointXYZ> range;
     PointCloud<PointXYZ>::Ptr rangeptr(&range);
     pcl::PointCloud<PointXYZ> Outliers;
@@ -69,6 +75,7 @@ PointCloud<PointXYZ> fspf() {
         // create best plane pointcloud
         PointCloud<PointXYZ> BPP;
         vector<int> bestInliers;
+        Normal bestNorm;
 
         if (range.size() < NEIGH_DENSITY) { continue; }
         
@@ -104,6 +111,7 @@ PointCloud<PointXYZ> fspf() {
                 // save indices to inliers if best
                 bestInliers = inlierIndices;
                 numinliers = inlierIndices.size();
+                bestNorm = norm;
             }
         }
 
@@ -111,6 +119,11 @@ PointCloud<PointXYZ> fspf() {
         if (numinliers >= MIN_INLIER*numsearch) {
             n += numinliers;
             PlanePoints += BPP;
+
+            for (int i = 0; i < BPP.size(); i++) {
+                normals[BPP[i]] = bestNorm;
+            }
+
         } else {
             Outliers += BPP;
         }
@@ -127,6 +140,9 @@ PointCloud<PointXYZ> fspf() {
 
     cout << "Filtered Cloud size: " << PlanePoints.size() << endl;
     cout << "Outliers size: " << Outliers.size() << endl;
+
+
+    my_normals = normals;
 
     return PlanePoints;
 }
