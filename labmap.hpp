@@ -4,8 +4,6 @@ using namespace std;
 using namespace pcl;
 
 
-
-
 Line createLine(float x1, float y1, float x2, float y2) {
     PointXY s, e;
 
@@ -61,4 +59,3 @@ vector<Line> makeMap() {
 
     return map;
 }
-
