@@ -3,8 +3,6 @@
 
 #define INF 16384
 
-#include <ros/ros.h>
-#include <pcl_ros/point_cloud.h>
 #include <cmath>
 #include <vector>
 #include <pcl/point_types.h>
@@ -16,6 +14,10 @@ using namespace pcl;
 double dst(pcl::PointXYZ a, pcl::PointXYZ b) {
     double m = pow((a.x - b.x), 2) + pow((a.y - b.y), 2) + pow((a.z - b.z), 2);
     return sqrt(m);
+}
+
+float dst2dsqd(PointXY a, PointXY b) {
+    return pow((a.x - b.x), 2) + pow((a.y - b.y), 2);
 }
 
 PointXYZ crossp(PointXYZ A, PointXYZ B) {

@@ -3,8 +3,6 @@
 
 #include <unordered_map>
 
-#include <sensor_msgs/PointCloud2.h>
-#include <ros/console.h>
 #include "pcl/pcl_base.h"
 #include "pcl/PointIndices.h"
 #include "pcl/conversions.h"

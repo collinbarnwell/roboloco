@@ -4,7 +4,6 @@
 #define INF 16384
 
 #include "basic_utilities.hpp"
-#include <cmath>
 
 using namespace std;
 using namespace pcl;
