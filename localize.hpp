@@ -3,11 +3,16 @@
 
 #include "fspf.hpp"
 #include "raycast.hpp"
+#include "movement_keeper.hpp"
 
 #define MAX_NORMAL_DIFF 0.0872 // 0.0872 = 5 degrees
 // #define SIGMA .02 // standard deviation of distance measurement
 // #define DISCOUNT 10 // discounting factor f <- ??????????
 #define KONSTANT .08 // 2 * SIGMA^2 * f
+
+// Map boundaries
+#define MAPMAXY 7.62
+#define MAPMAXX 10.21
 
 using namespace std;
 using namespace pcl;
@@ -19,6 +24,7 @@ class Particle {
         float getWeight();
         PointXY getPos();
         float getAngle();
+        void moveP(float x, float y, float ang);
     private:
         float weight;
         PointXY pos;
@@ -46,18 +52,35 @@ float Particle::getAngle() {
     return angle;
 }
 
-// CGR /////////////////////////////////////
-
-void motionEvolve(vector<Particle> &belief) { // need to add other argument for accumulated commands
-
+void Particle::moveP(float x, float y, float ang) {
+    angle += ang;
+    pos.x += x;
+    pos.y += y;
 }
 
-void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, unordered_map<PointXYZ, Normal> normals, vector<Line> map) {
+// CGR /////////////////////////////////////
 
-    motionEvolve(belief);
+void motionEvolve(vector<Particle> &belief, MovementKeeper mk) 
+{
+    for (int i = 0; i < belief.size(); i++) 
+    {
+        belief[i].moveP(mk.getXPos(), mk.getYPos(), mk.getAngle());
+    }
 
+    for (int i = belief.size() - 1; i >= 0; i--) 
+    {
+        float curx = belief[i].getPos().x;
+        float cury = belief[i].getPos().y;
+        if (curx > MAPMAXX || curx < 0 || cury > MAPMAXY || cury < 0) {
+            belief.erase(i);
+        }
+    }
+}
+
+void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, unordered_map<PointXYZ, Normal> normals, vector<Line> map) 
+{
     for (int i = 0; i < belief.size(); i++)
-    // iterating through particles in belief
+    // iterating through particles in belief to calculate p
     {
         vector<Line> raycastMap;
         AnalyticRayCast(belief[i].pos, map, raycastMap)
@@ -94,31 +117,19 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, unordered
             }
         }
 
-        // do more stuff with particle and obsLikelihood:
+        belief[i].setWeight(obsLikelihood);
 
-        
-        // 
-
-        
+        // calc maxp and averagep?
     }
 
+    // do more stuff with particle and obsLikelihood:
 
+    // Pick only particles with highest P (based on maxP and average p?)
+
+    // Add in some random particles
 
 
 }
-
-
-
-// ---
-// linear: 
-//   x: 0.5
-//   y: 0.0
-//   z: 0.0
-// angular: 
-//   x: 0.0
-//   y: 0.0
-//   z: 0.168472617865
-
 
 
 #endif

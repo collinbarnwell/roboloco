@@ -1,7 +1,6 @@
 #include "localize.hpp"
 #include "my_viz.hpp"
 
-#include <ros/ros.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/console.h>
 #include <geometry_msgs/Twist.h>
@@ -14,9 +13,12 @@ using namespace pcl;
 pcl::PointCloud<pcl::PointXYZ> my_cloud_global;
 // PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud_global);
 
+MovementKeeper myMoves_global;
+vector<Particle> belief_global;
 
-void pointcloudCallback(const sensor_msgs::PointCloud2 msg) { 
-    cout << "inside callback" << endl;
+void pointcloudCallback(const sensor_msgs::PointCloud2 msg) 
+{ 
+    cout << "Pointcloud callback running..." << endl;
 
     pcl::fromROSMsg(msg, my_cloud_global);
 
@@ -25,18 +27,31 @@ void pointcloudCallback(const sensor_msgs::PointCloud2 msg) {
 
     PlanePoints = fspf(my_cloud_global, my_normals);
 
-    vector<Particle> belief; // create random belief
-    CGRLocalize(belief, PlanePoints, my_normals);
+
+    if (belief_global.size() == 0) {
+        // create random belief
+
+
+    }
+
+    motionEvolve(belief_global, myMoves_global);
+    myMoves_global.reset();
+
+    CGRLocalize(belief_global, PlanePoints, my_normals);
+
 
     // visualize2(PlanePoints);
+    cout << "Pointcloud callback finished running." << endl;
 }
 
-void cmdCallback(const geometry_msgs::Twist& vel_cmd) {
-    // ROS_INFO("I heard: [%f]", vel_cmd.linear.y);
-
+void cmdCallback(const geometry_msgs::Twist& vel_cmd) 
+{
+    myMoves_global.makeMoves(vel_cmd.linear.x, vel_cmd.angular.z);
+    cout << "Just moved." << endl;
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) 
+{
     ros::init(argc, argv, "localizer");
     ros::NodeHandle nh;
     ros::Subscriber sub = nh.subscribe("/right_cloud_transform", 1, pointcloudCallback);
