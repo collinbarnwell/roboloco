@@ -46,7 +46,7 @@ float MovementKeeper::getYPos() {
     return ypos;
 }
 
-void makeMoves(float x, float ang) {
+void MovementKeeper::makeMoves(float x, float ang) {
     float t = ros::Time::now().toSec() - lastCmd;
 
     angle += t*ang;

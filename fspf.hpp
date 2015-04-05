@@ -1,12 +1,12 @@
 #ifndef FSPF_FXN
 #define FSPF_FXN
 
-#include <unordered_map>
+// #include <unordered_map>
 
 #include "pcl/pcl_base.h"
 #include "pcl/PointIndices.h"
 #include "pcl/conversions.h"
-#include "pcl/common/impl/io.hpp"
+// #include "pcl/common/impl/io.hpp"
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/voxel_grid.h>
@@ -29,14 +29,14 @@ using namespace pcl;
 
 
 
-PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud, unordered_map<PointXYZ, Normal> &my_normals) {
-    unordered_map<PointXYZ, Normal> normals;
+PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud) {
 
     PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud);
 
     PointCloud<PointXYZ> range;
     PointCloud<PointXYZ>::Ptr rangeptr(&range);
     pcl::PointCloud<PointXYZ> Outliers;
+    pcl::PointCloud<PointXYZ> PlanePoints;
 
     int k = 0;
     int n = 0;
@@ -108,6 +108,12 @@ PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud, unordered_map<PointXYZ,
 
                 // save indices to inliers if best
                 bestInliers = inlierIndices;
+
+                cout << "INLIER INDICES:   ";
+                cout << inlierIndices[0] << ", ";
+                cout << inlierIndices[1] << ", ";
+                cout << inlierIndices[2] << "..." << endl;
+
                 numinliers = inlierIndices.size();
                 bestNorm = norm;
             }
@@ -119,7 +125,7 @@ PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud, unordered_map<PointXYZ,
             PlanePoints += BPP;
 
             for (int i = 0; i < BPP.size(); i++) {
-                normals[BPP[i]] = bestNorm;
+                // normals[BPP[i]] = bestNorm;
             }
 
         } else {
@@ -140,7 +146,7 @@ PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud, unordered_map<PointXYZ,
     cout << "Outliers size: " << Outliers.size() << endl;
 
 
-    my_normals = normals;
+    // my_normals = normals;
 
     return PlanePoints;
 }

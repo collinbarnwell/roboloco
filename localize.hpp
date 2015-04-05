@@ -19,7 +19,7 @@ using namespace pcl;
 
 class Particle {
     public:
-        Particle(pos, angle);
+        Particle(PointXY pos, float angle);
         void setWeight(float w);
         float getWeight();
         PointXY getPos();
@@ -31,7 +31,7 @@ class Particle {
         float angle;
 };
 
-Particle::Particle(p, a) {
+Particle::Particle(PointXY p, float a) {
     pos = p;
     angle = a;
 }
@@ -72,18 +72,18 @@ void motionEvolve(vector<Particle> &belief, MovementKeeper mk)
         float curx = belief[i].getPos().x;
         float cury = belief[i].getPos().y;
         if (curx > MAPMAXX || curx < 0 || cury > MAPMAXY || cury < 0) {
-            belief.erase(i);
+            belief.erase(belief.begin() + i);
         }
     }
 }
 
-void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, unordered_map<PointXYZ, Normal> normals, vector<Line> map) 
+void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, vector<Line> map) // need normals
 {
     for (int i = 0; i < belief.size(); i++)
     // iterating through particles in belief to calculate p
     {
         vector<Line> raycastMap;
-        AnalyticRayCast(belief[i].pos, map, raycastMap)
+        AnalyticRayCast(belief[i].getPos(), map, raycastMap);
 
         float obsLikelihood = 1.0;
 
@@ -92,11 +92,11 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, unordered
         // iterate through points in cloud
         {
             PointXY cloudpt;
-            cloudpt.x = cloud[j].x + belief[i].pos.x;
-            cloudpt.y = cloud[j].y + belief[i].pos.y;
+            cloudpt.x = cloud[j].x + belief[i].getPos().x;
+            cloudpt.y = cloud[j].y + belief[i].getPos().y;
 
-            Line toCloudpt(belief[i].pos, cloudpt);
-            Line wall;
+            Line toCloudpt(belief[i].getPos(), cloudpt);
+            // Line wall;
 
             PointXY intersection;
 
@@ -104,12 +104,12 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, unordered
             for (int k = 0; k < raycastMap.size(); k++) 
             {
                 if (toCloudpt.intersectOutOfBound(raycastMap[k], &intersection)) {
-                    wall = raycastMap[k];
+                    // wall = raycastMap[k];
 
-                    if ( angle < MAX_NORMAL_DIFF) {
-                        float di2 = dst2dqd(intersection, cloudpt);
+                    // if ( angle < MAX_NORMAL_DIFF) {
+                        float di2 = dst2dsqd(intersection, cloudpt);
                         obsLikelihood *= exp(-di2/KONSTANT);
-                    }
+                    // }
 
                     break;
                 }

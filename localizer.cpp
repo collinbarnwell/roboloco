@@ -1,5 +1,6 @@
 #include "localize.hpp"
 #include "my_viz.hpp"
+#include "labmap.hpp"
 
 #include <pcl_ros/point_cloud.h>
 #include <ros/console.h>
@@ -23,9 +24,9 @@ void pointcloudCallback(const sensor_msgs::PointCloud2 msg)
     pcl::fromROSMsg(msg, my_cloud_global);
 
     PointCloud<PointXYZ> PlanePoints;
-    unordered_map<PointXYZ, Normal> my_normals;
+    // unordered_map<PointXYZ, Normal> my_normals;
 
-    PlanePoints = fspf(my_cloud_global, my_normals);
+    PlanePoints = fspf(my_cloud_global);
 
 
     if (belief_global.size() == 0) {
@@ -37,7 +38,9 @@ void pointcloudCallback(const sensor_msgs::PointCloud2 msg)
     motionEvolve(belief_global, myMoves_global);
     myMoves_global.reset();
 
-    CGRLocalize(belief_global, PlanePoints, my_normals);
+    vector<Line> map = makeMap();
+
+    CGRLocalize(belief_global, PlanePoints, map);
 
 
     // visualize2(PlanePoints);
@@ -57,7 +60,7 @@ int main(int argc, char** argv)
     ros::Subscriber sub = nh.subscribe("/right_cloud_transform", 1, pointcloudCallback);
 
     ros::NodeHandle nh2;
-    ros::Subscriber sub2 = nh2.subscribe("/cmd_vel", 1, cmdCallback)
+    ros::Subscriber sub2 = nh2.subscribe("/cmd_vel", 1, cmdCallback);
 
     cout << "inside of node" << endl;
     
