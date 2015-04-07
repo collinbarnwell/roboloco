@@ -18,29 +18,32 @@ MovementKeeper myMoves_global;
 vector<Particle> belief_global;
 
 void pointcloudCallback(const sensor_msgs::PointCloud2 msg) 
-{ 
+{
     cout << "Pointcloud callback running..." << endl;
+
+    ros::Time::init();
+    myMoves_global.initTime();
 
     pcl::fromROSMsg(msg, my_cloud_global);
 
     PointCloud<PointXYZ> PlanePoints;
     // unordered_map<PointXYZ, Normal> my_normals;
 
-    PlanePoints = fspf(my_cloud_global);
+    // PlanePoints = fspf(my_cloud_global);
 
 
-    if (belief_global.size() == 0) {
-        // create random belief
+    // if (belief_global.size() == 0) {
+    //     // create random belief
 
 
-    }
+    // }
 
-    motionEvolve(belief_global, myMoves_global);
-    myMoves_global.reset();
+    // motionEvolve(belief_global, myMoves_global);
+    // myMoves_global.reset();
 
-    vector<Line> map = makeMap();
+    // vector<Line> map = makeMap();
 
-    CGRLocalize(belief_global, PlanePoints, map);
+    // CGRLocalize(belief_global, PlanePoints, map);
 
 
     // visualize2(PlanePoints);

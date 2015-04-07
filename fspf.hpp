@@ -27,6 +27,7 @@
 using namespace std;
 using namespace pcl;
 
+// !!!!!!!!!!!!! SEG FAULT IN THIS FILE
 
 
 PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud) {

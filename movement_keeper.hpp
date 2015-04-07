@@ -13,6 +13,7 @@ class MovementKeeper {
         float getYPos();
         void makeMoves(float x, float ang);
         void reset();
+        void initTime();
     private:
         float angle;
         float xpos;
@@ -24,6 +25,9 @@ MovementKeeper::MovementKeeper() {
     angle = 0;
     xpos = 0;
     ypos = 0;
+}
+
+void MovementKeeper::initTime() {
     lastCmd = ros::Time::now().toSec();
 }
 
