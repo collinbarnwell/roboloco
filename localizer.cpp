@@ -11,18 +11,25 @@ using namespace std;
 using namespace pcl;
 
 
-pcl::PointCloud<pcl::PointXYZ> my_cloud_global;
-// PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud_global);
+class Everything 
+{
+    private:
+        pcl::PointCloud<pcl::PointXYZ> my_cloud_global;
+        // PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud_global);
 
-MovementKeeper myMoves_global;
-vector<Particle> belief_global;
+        MovementKeeper myMoves;
+        vector<Particle> belief_global;
+    public:
+        void pointcloudCallback(const sensor_msgs::PointCloud2 msg);
+        void cmdCallback(const geometry_msgs::Twist& vel_cmd);
+};
 
-void pointcloudCallback(const sensor_msgs::PointCloud2 msg) 
+void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg) 
 {
     cout << "Pointcloud callback running..." << endl;
 
     ros::Time::init();
-    myMoves_global.initTime();
+    myMoves.initTime();
 
     pcl::fromROSMsg(msg, my_cloud_global);
 
@@ -38,8 +45,8 @@ void pointcloudCallback(const sensor_msgs::PointCloud2 msg)
 
     // }
 
-    // motionEvolve(belief_global, myMoves_global);
-    // myMoves_global.reset();
+    // motionEvolve(belief_global, myMoves);
+    // myMoves.reset();
 
     // vector<Line> map = makeMap();
 
@@ -50,20 +57,26 @@ void pointcloudCallback(const sensor_msgs::PointCloud2 msg)
     cout << "Pointcloud callback finished running." << endl;
 }
 
-void cmdCallback(const geometry_msgs::Twist& vel_cmd) 
+void Everything::cmdCallback(const geometry_msgs::Twist& vel_cmd) 
 {
-    myMoves_global.makeMoves(vel_cmd.linear.x, vel_cmd.angular.z);
+    myMoves.makeMoves(vel_cmd.linear.x, vel_cmd.angular.z);
     cout << "Just moved." << endl;
 }
 
+
 int main(int argc, char** argv) 
 {
+    Everything container;
+
     ros::init(argc, argv, "localizer");
     ros::NodeHandle nh;
-    ros::Subscriber sub = nh.subscribe("/right_cloud_transform", 1, pointcloudCallback);
+    ros::Subscriber sub = nh.subscribe("/right_cloud_transform", 1,
+                                        &Everything::pointcloudCallback,
+                                        &container);
 
     ros::NodeHandle nh2;
-    ros::Subscriber sub2 = nh2.subscribe("/cmd_vel", 1, cmdCallback);
+    ros::Subscriber sub2 = nh2.subscribe("/cmd_vel", 1, &Everything::cmdCallback,
+                                            &container);
 
     cout << "inside of node" << endl;
     
