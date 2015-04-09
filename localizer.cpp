@@ -1,6 +1,7 @@
 #include "localize.hpp"
 #include "my_viz.hpp"
 #include "labmap.hpp"
+#include "fspf.hpp"
 
 #include <pcl_ros/point_cloud.h>
 #include <ros/console.h>
@@ -66,6 +67,7 @@ void Everything::cmdCallback(const geometry_msgs::Twist& vel_cmd)
 
 int main(int argc, char** argv) 
 {
+    cout << "Starting main..." << endl;
     Everything container;
 
     ros::init(argc, argv, "localizer");

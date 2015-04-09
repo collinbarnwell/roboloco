@@ -1,7 +1,6 @@
 #ifndef LOCALIZARD
 #define LOCALIZARD
 
-#include "fspf.hpp"
 #include "raycast.hpp"
 #include "movement_keeper.hpp"
 
