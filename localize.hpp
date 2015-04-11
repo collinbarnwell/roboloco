@@ -76,7 +76,7 @@ void motionEvolve(vector<Particle> &belief, MovementKeeper mk)
     }
 }
 
-void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, vector<Line> map) // need normals
+void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointCloud<PointXY> normals, vector<Line> map) // need normals
 {
     for (int i = 0; i < belief.size(); i++)
     // iterating through particles in belief to calculate p

@@ -1,7 +1,6 @@
 #ifndef FSPF_FXN
 #define FSPF_FXN
 
-// #include <unordered_map>
 
 #include "pcl/pcl_base.h"
 #include "pcl/PointIndices.h"
@@ -9,7 +8,7 @@
 // #include "pcl/common/impl/io.hpp"
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/filters/extract_indices.h>
-#include <pcl/filters/voxel_grid.h>
+// #include <pcl/filters/voxel_grid.h>
 
 #include "basic_utilities.hpp"
 
@@ -27,17 +26,14 @@
 using namespace std;
 using namespace pcl;
 
-// !!!!!!!!!!!!! SEG FAULT IN THIS FILE
 
-
-PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud) {
+void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
 
     PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud);
 
     PointCloud<PointXYZ> range;
     PointCloud<PointXYZ>::Ptr rangeptr(&range);
     pcl::PointCloud<PointXYZ> Outliers;
-    pcl::PointCloud<PointXYZ> PlanePoints;
 
     int k = 0;
     int n = 0;
@@ -125,9 +121,16 @@ PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud) {
             n += numinliers;
             PlanePoints += BPP;
 
+            // declare temporary normals vector
+            PointCloud<PointXY> normals;
+
             for (int i = 0; i < BPP.size(); i++) {
-                // normals[BPP[i]] = bestNorm;
+                // calculate 2D-projected normal of BPP
+                PointXY newpoint = projectNorm(bestNorm);
+                normals.push_back(newpoint);
             }
+
+            PlanePointsNormals += normals;
 
         } else {
             Outliers += BPP;
@@ -146,10 +149,7 @@ PointCloud<PointXYZ> fspf(PointCloud<PointXYZ> my_cloud) {
     cout << "Filtered Cloud size: " << PlanePoints.size() << endl;
     cout << "Outliers size: " << Outliers.size() << endl;
 
-
-    // my_normals = normals;
-
-    return PlanePoints;
+    return;
 }
 
 

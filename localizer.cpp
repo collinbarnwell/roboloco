@@ -8,6 +8,8 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/PointCloud2.h>
 
+#define PARTICLE_NUM 200
+
 using namespace std;
 using namespace pcl;
 
@@ -15,11 +17,11 @@ using namespace pcl;
 class Everything 
 {
     private:
-        pcl::PointCloud<pcl::PointXYZ> my_cloud_global;
+        pcl::PointCloud<pcl::PointXYZ> my_cloud;
         // PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud_global);
 
         MovementKeeper myMoves;
-        vector<Particle> belief_global;
+        vector<Particle> belief;
     public:
         void pointcloudCallback(const sensor_msgs::PointCloud2 msg);
         void cmdCallback(const geometry_msgs::Twist& vel_cmd);
@@ -32,27 +34,32 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
     ros::Time::init();
     myMoves.initTime();
 
-    pcl::fromROSMsg(msg, my_cloud_global);
+    pcl::fromROSMsg(msg, my_cloud);
 
     PointCloud<PointXYZ> PlanePoints;
-    // unordered_map<PointXYZ, Normal> my_normals;
+    PointCloud<PointXY> PlaneNorms;
 
-    // PlanePoints = fspf(my_cloud_global);
+    fspf(my_cloud, PlanePoints, PlaneNorms);
 
+    if (belief.size() == 0) {
+        // create random belief
+        // Room corners: (0, 0) to (10.2, 7.6)
+        for (int i = 0; i < PARTICLE_NUM; i++) {
+            Point XY pos;
+            pos.x = rand()%10.2;
+            pos.y = rand()%7.6;
 
-    // if (belief_global.size() == 0) {
-    //     // create random belief
+            Particle pb = Particle(pos, rand()%(2 * PI));
+            belief.push_back(pb);
+        }
+    }
 
+    motionEvolve(belief, myMoves);
+    myMoves.reset();
 
-    // }
+    vector<Line> map = makeMap();
 
-    // motionEvolve(belief_global, myMoves);
-    // myMoves.reset();
-
-    // vector<Line> map = makeMap();
-
-    // CGRLocalize(belief_global, PlanePoints, map);
-
+    CGRLocalize(belief_global, PlanePoints, PlaneNorms, map);
 
     // visualize2(PlanePoints);
     cout << "Pointcloud callback finished running." << endl;
@@ -67,7 +74,6 @@ void Everything::cmdCallback(const geometry_msgs::Twist& vel_cmd)
 
 int main(int argc, char** argv) 
 {
-    cout << "Starting main..." << endl;
     Everything container;
 
     ros::init(argc, argv, "localizer");

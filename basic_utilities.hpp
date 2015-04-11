@@ -2,6 +2,7 @@
 #define BASIC_YOOTS
 
 #define INF 16384
+#define PI 3.1415926
 
 #include <cmath>
 #include <vector>
@@ -46,6 +47,10 @@ float magnitude(PointXYZ n) {
     return sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
 }
 
+float magnitude(Normal n) {
+    return sqrt(n.normal_x*n.normal_x + n.normal_y*n.normal_y + n.normal_z*n.normal_z);
+}
+
 float dotpn(PointXYZ a, Normal b) {
     return a.x * b.normal_x + a.y * b.normal_y + a.z * b.normal_z;
 }
@@ -61,6 +66,15 @@ bool veryCloseTo(float a, float b) {
     } else {
         return false;
     }
+}
+
+PointXY projectNorm(Normal n) {
+    n.normal_z = 0;
+    float l = magnitude(n);
+    PointXY p;
+    p.x = n.normal_x/l;
+    p.y = n.normal_y/l;
+    return p;
 }
 
 
