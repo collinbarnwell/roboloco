@@ -76,40 +76,55 @@ void motionEvolve(vector<Particle> &belief, MovementKeeper mk)
     }
 }
 
-void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointCloud<PointXY> normals, vector<Line> map) // need normals
+// convert normal from robot-space to map-space
+PointXY convertNorm(PointXY p, float ang) {
+    // rotate p by ang
+    PointXY newp;
+    newp.x = p.x * cos(ang) - p.y * sin(ang);
+    newp.y = p.x * sin(ang) + p.y * cos(ang);
+    return newp;
+}
+
+void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointCloud<PointXY> normals, vector<Line> map)
 {
+    float maxp = 0;
+    float sump = 0;
+
     for (int i = 0; i < belief.size(); i++)
-    // iterating through particles in belief to calculate p
+    // iterating through particles in belief to calculate p - belief index is i
     {
         vector<Line> raycastMap;
         AnalyticRayCast(belief[i].getPos(), map, raycastMap);
 
         float obsLikelihood = 1.0;
 
-
         for (int j = 0; j < cloud.size(); j++) 
-        // iterate through points in cloud
+        // iterate through points in cloud - point (AND NORMAL) index is j
         {
             PointXY cloudpt;
             cloudpt.x = cloud[j].x + belief[i].getPos().x;
             cloudpt.y = cloud[j].y + belief[i].getPos().y;
 
             Line toCloudpt(belief[i].getPos(), cloudpt);
-            // Line wall;
 
             PointXY intersection;
 
-            // iterate through viewable lines raycasted map
+            // iterate through viewable lines raycasted map - line index is k
             for (int k = 0; k < raycastMap.size(); k++) 
             {
                 if (toCloudpt.intersectOutOfBound(raycastMap[k], &intersection)) {
-                    // wall = raycastMap[k];
+                    Line wall = raycastMap[k];
 
-                    // if ( angle < MAX_NORMAL_DIFF) {
+                    // convert normal from robot-space to map-space
+                    PointXY n = convertNorm(normals[j], belief[i].getAngle());
+
+                    // calculate angle between map-space point normal n (0, 0) to (<PointXY>) and wall normal (Line)
+                    if (wall.angleAboveMax(n, MAX_NORMAL_DIFF)) {
                         float di2 = dst2dsqd(intersection, cloudpt);
                         obsLikelihood *= exp(-di2/KONSTANT);
-                    // }
+                    }
 
+                    // found corresponding wall; break out of loop
                     break;
                 }
 
@@ -118,12 +133,19 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
         belief[i].setWeight(obsLikelihood);
 
-        // calc maxp and averagep?
+        // find maximum weigt
+        if (obsLikelihood > maxp) {
+            maxp = obsLikelihood;
+        }
+
+        // find avg weigt
+        sump += obsLikelihood;
     }
 
-    // do more stuff with particle and obsLikelihood:
+    float avgp = sump/belief.size();
 
-    // Pick only particles with highest P (based on maxP and average p?)
+    // Pick only particles with highest P (based on maxp and avgp)
+
 
     // Add in some random particles
 

@@ -23,6 +23,7 @@ class Line {
         void print();
         float lengthSqd();
         void checkLength();
+        bool angleAboveMax(PointXY p, float max);
     private:
         PointXY start;
         PointXY end;
@@ -39,6 +40,30 @@ Line::Line(PointXY s, PointXY e) {
 void Line::checkLength() {
     if (lengthSqd() <= .01*.01) {
         is_zero = true;
+    }
+}
+
+bool Line::angleAboveMax(PointXY p, float max) {
+    // calculate angle between (0, 0) to p (<PointXY>) and NORMAL of self (Line) IN RADIANS
+    float lx = start.x - end.x;
+    float ly = start.y - end.y;
+
+    // magnitudes
+    float ll = sqrt(lx*lx + ly*ly);
+    float lp = sqrt(p.x*p.x + p.y*p.y);
+
+    // dotp of normalized vectors
+    float dotp = (lx*p.x + ly * p.y)/(lp*ll);
+    
+    // range of ang is [0, Pi]
+    float ang = acos(dotp);
+
+    // angle should be between Pi/4 + max and Pi/4 - max
+    if (ang <= PI/4 + max) && (ang >= PI/4 - max) {
+        return true;
+    }
+    else {
+        return false;
     }
 }
 
