@@ -163,6 +163,15 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     // Sort particles in descending order by weight
     sort(belief.end(), belief.begin());
 
+    // Print best guess
+    cout << "------------------------" << endl;
+    cout << "Current Best Guess: " << endl;
+    cout << "Position-x: " << belief[0].getPos().x << endl;
+    cout << "Position-y: " << belief[0].getPos().y << endl;
+    cout << "Position-y: " << belief[0].getPos().y << endl;
+    cout << "Angle: " << belief[0].getAngle() << endl;
+    cout << "------------------------" << endl;
+
     // choose best KEEP_RATIO percent, create NEW_SAMPS new samples near each
     int keepers = KEEP_RATIO * belief.size();
 

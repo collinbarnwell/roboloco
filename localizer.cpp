@@ -13,6 +13,7 @@
 using namespace std;
 using namespace pcl;
 
+ros::Subscriber sub, sub2;
 
 class Everything 
 {
@@ -73,15 +74,16 @@ int main(int argc, char** argv)
 
     ros::init(argc, argv, "localizer");
     ros::NodeHandle nh;
-    ros::Subscriber sub = nh.subscribe("/right_cloud_transform", 1,
+
+
+    sub = nh.subscribe("/filtered_voxel", 1,
                                         &Everything::pointcloudCallback,
                                         &container);
 
-    ros::NodeHandle nh2;
-    ros::Subscriber sub2 = nh2.subscribe("/cmd_vel", 1, &Everything::cmdCallback,
+    sub2 = nh.subscribe("/cmd_vel", 1, &Everything::cmdCallback,
                                             &container);
 
-    cout << "inside of node" << endl;
+    cout << "Subscribers have been initialized." << endl;
     
     ros::spin();
     return 0;
