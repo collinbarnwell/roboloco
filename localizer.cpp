@@ -45,12 +45,7 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
         // create random belief
         // Room corners: (0, 0) to (10.2, 7.6)
         for (int i = 0; i < PARTICLE_NUM; i++) {
-            Point XY pos;
-            pos.x = rand()%10.2;
-            pos.y = rand()%7.6;
-
-            Particle pb = Particle(pos, rand()%(2 * PI));
-            belief.push_back(pb);
+            belief.push_back(randomParticle());
         }
     }
 
@@ -59,7 +54,7 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
 
     vector<Line> map = makeMap();
 
-    CGRLocalize(belief_global, PlanePoints, PlaneNorms, map);
+    CGRLocalize(belief, PlanePoints, PlaneNorms, map);
 
     // visualize2(PlanePoints);
     cout << "Pointcloud callback finished running." << endl;

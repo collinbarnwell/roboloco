@@ -59,7 +59,7 @@ bool Line::angleAboveMax(PointXY p, float max) {
     float ang = acos(dotp);
 
     // angle should be between Pi/4 + max and Pi/4 - max
-    if (ang <= PI/4 + max) && (ang >= PI/4 - max) {
+    if ((ang <= PI/4 + max) && (ang >= PI/4 - max)) {
         return true;
     }
     else {

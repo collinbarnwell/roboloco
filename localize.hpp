@@ -8,10 +8,15 @@
 // #define SIGMA .02 // standard deviation of distance measurement
 // #define DISCOUNT 10 // discounting factor f <- ??????????
 #define KONSTANT .08 // 2 * SIGMA^2 * f
+#define KEEP_RATIO .1
+#define NEW_SAMPS 6
 
 // Map boundaries
 #define MAPMAXY 7.62
 #define MAPMAXX 10.21
+
+#define ANGLE_VARIANCE 0.17 // in rads = ~10 degrees
+#define DIST_VARIANCE 0.3 // in meters
 
 using namespace std;
 using namespace pcl;
@@ -57,7 +62,33 @@ void Particle::moveP(float x, float y, float ang) {
     pos.y += y;
 }
 
+bool operator<(Particle p1, Particle p2) { 
+     return (p1.getWeight() < p2.getWeight());
+}
+
 // CGR /////////////////////////////////////
+
+Particle randomParticle() {
+    PointXY pos;
+    pos.x = fmod(rand(), MAPMAXX);
+    pos.y = fmod(rand(), MAPMAXY);
+
+    return Particle( pos, fmod(rand(),(2 * PI)) );
+}
+
+void checkBounds(vector<Particle> &belief) {
+    for (int i = belief.size() - 1; i >= 0; i--) 
+    {
+        float curx = belief[i].getPos().x;
+        float cury = belief[i].getPos().y;
+        if (curx > MAPMAXX || curx < 0 || cury > MAPMAXY || cury < 0) {
+            // if OB, replace wit random particle
+            belief[i] = randomParticle();
+
+            // belief.erase(belief.begin() + i);
+        }
+    }
+}
 
 void motionEvolve(vector<Particle> &belief, MovementKeeper mk) 
 {
@@ -66,14 +97,7 @@ void motionEvolve(vector<Particle> &belief, MovementKeeper mk)
         belief[i].moveP(mk.getXPos(), mk.getYPos(), mk.getAngle());
     }
 
-    for (int i = belief.size() - 1; i >= 0; i--) 
-    {
-        float curx = belief[i].getPos().x;
-        float cury = belief[i].getPos().y;
-        if (curx > MAPMAXX || curx < 0 || cury > MAPMAXY || cury < 0) {
-            belief.erase(belief.begin() + i);
-        }
-    }
+    checkBounds(belief);
 }
 
 // convert normal from robot-space to map-space
@@ -87,8 +111,11 @@ PointXY convertNorm(PointXY p, float ang) {
 
 void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointCloud<PointXY> normals, vector<Line> map)
 {
-    float maxp = 0;
-    float sump = 0;
+    // TODO: Move this to main after #definitions are abstracted
+    if (KEEP_RATIO * (NEW_SAMPS + 1) > 1.0) {
+        cout << "!! KEEP_RATIO is too big for NEW_SAMPS value !!" << endl;
+        return;
+    }
 
     for (int i = 0; i < belief.size(); i++)
     // iterating through particles in belief to calculate p - belief index is i
@@ -127,29 +154,42 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
                     // found corresponding wall; break out of loop
                     break;
                 }
-
             }
         }
 
         belief[i].setWeight(obsLikelihood);
-
-        // find maximum weigt
-        if (obsLikelihood > maxp) {
-            maxp = obsLikelihood;
-        }
-
-        // find avg weigt
-        sump += obsLikelihood;
     }
 
-    float avgp = sump/belief.size();
+    // Sort particles in descending order by weight
+    sort(belief.end(), belief.begin());
 
-    // Pick only particles with highest P (based on maxp and avgp)
+    // choose best KEEP_RATIO percent, create NEW_SAMPS new samples near each
+    int keepers = KEEP_RATIO * belief.size();
 
+    for (int i = 0; i < keepers; i++) 
+    {
+        // create NEW_SAMPS - 1, new particles near each keeper + keep self
+        // [k k ns ns ns ns space space space]
 
-    // Add in some random particles
+        for (int j = 0; j < NEW_SAMPS; j++) 
+        {
+            PointXY x;
+            float angle = belief[i].getAngle() + fmod(rand(),ANGLE_VARIANCE) - (ANGLE_VARIANCE/2.0);
+            x.x = belief[i].getPos().x + fmod(rand(),DIST_VARIANCE) - (DIST_VARIANCE/2.0);
+            x.y = belief[i].getPos().y + fmod(rand(),DIST_VARIANCE) - (DIST_VARIANCE/2.0);
 
+            belief[keepers + i*NEW_SAMPS + j] = Particle(x, angle);
+            // last assigned is belief[keepers + (keepers-1)*NEW_SAMPS + (NEW_SAMPS-1) - 1]
+            // = belief[keepers*NEW_SAMPS - 1]
+        }
+    }
 
+    // Add in remaining percentage random particles
+    for (int i = keepers*NEW_SAMPS; i < belief.size(); i++) {
+        belief[i] = randomParticle();
+    }
+
+    checkBounds(belief);
 }
 
 
