@@ -1,8 +1,6 @@
 #ifndef LINES_N_STUFF
 #define LINES_N_STUFF
 
-#define INF 16384
-
 #include "basic_utilities.hpp"
 
 using namespace std;
@@ -177,10 +175,10 @@ bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
         p.y = slopeme*(x - start.x) + start.y;
         *intersection = p;
 
-        cout << "INTERSECTION (out of bound) DETECTED (self, l): " << endl;
-        print();
-        l.print();
-        cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
+        // cout << "INTERSECTION (out of bound) DETECTED (self, l): " << endl;
+        // print();
+        // l.print();
+        // cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
 
         return true;
     }

@@ -1,7 +1,6 @@
 #ifndef FSPF_FXN
 #define FSPF_FXN
 
-
 #include "pcl/pcl_base.h"
 #include "pcl/PointIndices.h"
 #include "pcl/conversions.h"
@@ -13,15 +12,6 @@
 #include "basic_utilities.hpp"
 
 
-#define MAX_HOODS 3000 // kmax
-#define MAX_PTS 20000 // nmax
-#define LOCAL_SAMPS 80 // (l) num local samples
-// #define PLANE_SIZE .5 // S
-#define PLANE_OFFSET .03 // e
-#define MIN_INLIER .9 // alpha-in
-#define NEIGH_SIZE .25 // replaces Global_neigh
-#define NEIGH_DENSITY 20
-// #define GLOBAL_NEIGH 60 // n Neighborhood for global samples (in pixels) *** NOT USED ** 
 
 using namespace std;
 using namespace pcl;

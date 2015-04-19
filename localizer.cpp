@@ -8,8 +8,6 @@
 #include <geometry_msgs/Twist.h>
 #include <sensor_msgs/PointCloud2.h>
 
-#define PARTICLE_NUM 200
-
 using namespace std;
 using namespace pcl;
 
@@ -55,10 +53,16 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
         }
     }
 
+    cout << "Initialized belief" << endl;
+
     motionEvolve(belief, myMoves);
     myMoves.reset();
 
+    cout << "Evolved motion" << endl;
+
     vector<Line> map = makeMap();
+
+    cout << "Entering CGR" << endl;
 
     CGRLocalize(belief, PlanePoints, PlaneNorms, map);
 

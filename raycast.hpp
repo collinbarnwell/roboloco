@@ -113,6 +113,9 @@ void AnalyticRayCast(PointXY x, vector<Line> map, vector<Line> &L) { // untested
             L.push_back(currentLine);
         }
     }
+
+    cout << "Finised one AnalyticRayCast" << endl;
+    
     return;
 }
 

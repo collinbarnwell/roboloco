@@ -1,9 +1,7 @@
 #ifndef BASIC_YOOTS
 #define BASIC_YOOTS
 
-#define INF 16384
-#define PI 3.1415926
-
+#include "definitions.hpp"
 #include <cmath>
 #include <vector>
 #include <pcl/point_types.h>

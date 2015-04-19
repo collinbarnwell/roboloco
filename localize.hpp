@@ -1,22 +1,9 @@
 #ifndef LOCALIZARD
 #define LOCALIZARD
 
+#include "definitions.hpp"
 #include "raycast.hpp"
 #include "movement_keeper.hpp"
-
-#define MAX_NORMAL_DIFF 0.0872 // 0.0872 = 5 degrees
-// #define SIGMA .02 // standard deviation of distance measurement
-// #define DISCOUNT 10 // discounting factor f <- ??????????
-#define KONSTANT .08 // 2 * SIGMA^2 * f
-#define KEEP_RATIO .1
-#define NEW_SAMPS 6
-
-// Map boundaries
-#define MAPMAXY 7.62
-#define MAPMAXX 10.21
-
-#define ANGLE_VARIANCE 0.17 // in rads = ~10 degrees
-#define DIST_VARIANCE 0.3 // in meters
 
 using namespace std;
 using namespace pcl;
@@ -148,6 +135,7 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
                     // calculate angle between map-space point normal n (0, 0) to (<PointXY>) and wall normal (Line)
                     if (wall.angleAboveMax(n, MAX_NORMAL_DIFF)) {
                         float di2 = dst2dsqd(intersection, cloudpt);
+                        // **TODO: consider introducing MAX_DIST for di2
                         obsLikelihood *= exp(-di2/KONSTANT);
                     }
 
