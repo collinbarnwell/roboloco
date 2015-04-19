@@ -40,7 +40,12 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
     PointCloud<PointXYZ> PlanePoints;
     PointCloud<PointXY> PlaneNorms;
 
-    fspf(my_cloud, PlanePoints, PlaneNorms);
+    cout << "before fspf" << endl;
+
+    PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud);
+    fspf(my_cloud, my_cloud_ptr, PlanePoints, PlaneNorms);
+
+    cout << "finised fspf" << endl;
 
     if (belief.size() == 0) {
         // create random belief

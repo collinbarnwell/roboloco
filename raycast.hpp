@@ -48,7 +48,7 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
         pois.push_back(poi2);
     }
 
-    cout << "POIS SIZE: " << pois.size() << endl;
+    // cout << "POIS SIZE: " << pois.size() << endl;
 
     // if at least one endpoint is clear ^^
     // and there are no pois ^

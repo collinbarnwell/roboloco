@@ -132,10 +132,10 @@ bool Line::intersect(Line l, PointXY* intersection) {
         p.y = slopeme*(x - start.x) + start.y;
         *intersection = p;
 
-        cout << "INTERSECTION DETECTED (self, l): " << endl;
-        print();
-        l.print();
-        cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
+        // cout << "INTERSECTION DETECTED (self, l): " << endl;
+        // print();
+        // l.print();
+        // cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
 
         return true;
     }

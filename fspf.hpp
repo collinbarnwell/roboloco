@@ -13,7 +13,7 @@
 #include "basic_utilities.hpp"
 
 
-#define MAX_HOODS 30000 // kmax
+#define MAX_HOODS 3000 // kmax
 #define MAX_PTS 20000 // nmax
 #define LOCAL_SAMPS 80 // (l) num local samples
 // #define PLANE_SIZE .5 // S
@@ -27,12 +27,12 @@ using namespace std;
 using namespace pcl;
 
 
-void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
+void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ>::Ptr my_cloud_ptr, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
 
-    PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud);
+    // PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud); // possibly trying to be freed
 
     PointCloud<PointXYZ> range;
-    PointCloud<PointXYZ>::Ptr rangeptr(&range);
+    // PointCloud<PointXYZ>::Ptr rangeptr(&range);    // problem
     pcl::PointCloud<PointXYZ> Outliers;
 
     int k = 0;
@@ -57,7 +57,6 @@ void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ> &PlanePoints, Poin
         int numinliers = 0;
         kdtree.radiusSearch(a, NEIGH_SIZE, pointIdxRadiusSearch, pointRadiusSquaredDistance);
         int numsearch = pointIdxRadiusSearch.size();
-        // cout << numsearch << endl;
         boost::shared_ptr<vector<int> > rangeIndices (new vector<int> (pointIdxRadiusSearch));
 
         // filter range to new pointcloud
@@ -68,12 +67,15 @@ void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ> &PlanePoints, Poin
         rangefilter.filter(range);
 
         // create best plane pointcloud
-        PointCloud<PointXYZ> BPP;
         vector<int> bestInliers;
         Normal bestNorm;
+        PointCloud<PointXYZ> BPP;
+
+        // ExtractIndices<PointXYZ> BPPfilter;        
+        // BPPfilter.setInputCloud(rangeptr);
 
         if (range.size() < NEIGH_DENSITY) { continue; }
-        
+
         for (int i = 0; i < LOCAL_SAMPS; i++) {
             // pick 2 more points
             PointXYZ b = range[rand()%range.size()];
@@ -96,20 +98,22 @@ void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ> &PlanePoints, Poin
             // is it better or worse than best
             if (inlierIndices.size() > numinliers) {
                 // filter inliers to BPP if best
-                ExtractIndices<PointXYZ> BPPfilter;
-                BPPfilter.setInputCloud(rangeptr);
-                boost::shared_ptr<vector<int> > inliers(new vector<int> (inlierIndices));
-                BPPfilter.setIndices(inliers);
-                BPPfilter.setNegative(false);
-                BPPfilter.filter(BPP);
+
+                // boost::shared_ptr<vector<int> > inliers(new vector<int> (inlierIndices));
+                // BPPfilter.setIndices(inliers);
+                // BPPfilter.setNegative(false);
+                // BPPfilter.filter(BPP);
+
+                BPP.clear();
+
+                for (int q = 0; q < inlierIndices.size(); q++) 
+                {
+                    int ind = inlierIndices[q];
+                    BPP.push_back(my_cloud.points[ind]);
+                }
 
                 // save indices to inliers if best
                 bestInliers = inlierIndices;
-
-                cout << "INLIER INDICES:   ";
-                cout << inlierIndices[0] << ", ";
-                cout << inlierIndices[1] << ", ";
-                cout << inlierIndices[2] << "..." << endl;
 
                 numinliers = inlierIndices.size();
                 bestNorm = norm;
