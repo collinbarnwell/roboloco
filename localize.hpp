@@ -104,7 +104,9 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
         return;
     }
 
-    for (int i = 0; i < belief.size(); i++)
+    int beliefsize = belief.size();
+
+    for (int i = 0; i < beliefsize; i++)
     // iterating through particles in belief to calculate p - belief index is i
     {
         vector<Line> raycastMap;
@@ -112,7 +114,8 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
         float obsLikelihood = 1.0;
 
-        for (int j = 0; j < cloud.size(); j++) 
+        int cloudsize = cloud.size();
+        for (int j = 0; j < cloudsize; j++) 
         // iterate through points in cloud - point (AND NORMAL) index is j
         {
             PointXY cloudpt;
@@ -124,7 +127,8 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
             PointXY intersection;
 
             // iterate through viewable lines raycasted map - line index is k
-            for (int k = 0; k < raycastMap.size(); k++) 
+            int raycastmapsize = raycastMap.size();
+            for (int k = 0; k < raycastmapsize; k++) 
             {
                 if (toCloudpt.intersectOutOfBound(raycastMap[k], &intersection)) {
                     Line wall = raycastMap[k];
@@ -148,8 +152,10 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
         belief[i].setWeight(obsLikelihood);
     }
 
+    cout << "Finised p calculations, now sorting" << endl;
+
     // Sort particles in descending order by weight
-    sort(belief.end(), belief.begin());
+    sort(belief.end(), belief.begin()); // seg fault
 
     // Print best guess
     cout << "------------------------" << endl;
