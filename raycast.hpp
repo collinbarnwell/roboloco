@@ -93,17 +93,16 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
 
 
 void AnalyticRayCast(PointXY x, vector<Line> map, vector<Line> &L) {
-    cout << "Map size: " << map.size() << endl;
 
-    // for(vector<Line>::size_type i = 0; i != map.size(); i++) 
-    int i = -1;
-    for(size_t it = 0; it < map.size(); ++it) 
+    int map_size = map.size();
+
+    for (int i = 0; i < map_size; i++)
     {
-        i++;
-        cout << i << endl;
         Line currentLine = map[i];
 
-        for(vector<Line>::size_type j = 0; j != map.size(); j++) 
+        // for(vector<Line>::size_type j = 0; j != map.size(); j++)
+        // while (j < map_size)
+        for (int j = 0; j < map_size; j++)
         {
             if (j == i) { continue; }
 
@@ -112,7 +111,10 @@ void AnalyticRayCast(PointXY x, vector<Line> map, vector<Line> &L) {
 
         if (!currentLine.isZero()) 
         {
-            for(vector<Line>::size_type j = 0; j != L.size(); j++) {
+            int lsize = L.size();
+
+            // for(vector<Line>::size_type j = 0; j != L.size(); j++) {
+            for (int j = 0; j < lsize; j++) {
                 TrimOcclusion(x, L[j], currentLine, map);
             }
 
