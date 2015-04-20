@@ -12,7 +12,7 @@ class Particle {
     public:
         Particle(PointXY pos, float angle);
         void setWeight(float w);
-        float getWeight();
+        float getWeight() const;
         PointXY getPos();
         float getAngle();
         void moveP(float x, float y, float ang);
@@ -31,7 +31,7 @@ void Particle::setWeight(float w) {
     weight = w;
 }
 
-float Particle::getWeight() {
+float Particle::getWeight() const {
     return weight;
 }
 
@@ -49,8 +49,9 @@ void Particle::moveP(float x, float y, float ang) {
     pos.y += y;
 }
 
-bool operator<(Particle p1, Particle p2) { 
-     return (p1.getWeight() < p2.getWeight());
+bool operator<(const Particle& p1, const Particle& p2) {
+    // Note reversal:  geq is opposite of < for descending order sort
+    return (p1.getWeight() >= p2.getWeight());
 }
 
 // CGR /////////////////////////////////////
@@ -152,16 +153,13 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
         belief[i].setWeight(obsLikelihood);
     }
 
-    cout << "Finised p calculations, now sorting" << endl;
-
     // Sort particles in descending order by weight
-    sort(belief.end(), belief.begin()); // seg fault
+    sort(belief.begin(), belief.end()); // seg fault
 
     // Print best guess
     cout << "------------------------" << endl;
     cout << "Current Best Guess: " << endl;
     cout << "Position-x: " << belief[0].getPos().x << endl;
-    cout << "Position-y: " << belief[0].getPos().y << endl;
     cout << "Position-y: " << belief[0].getPos().y << endl;
     cout << "Angle: " << belief[0].getAngle() << endl;
     cout << "------------------------" << endl;

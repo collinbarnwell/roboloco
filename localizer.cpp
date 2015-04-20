@@ -89,7 +89,7 @@ int main(int argc, char** argv)
                                         &Everything::pointcloudCallback,
                                         &container);
 
-    sub2 = nh.subscribe("/cmd_vel", 1, &Everything::cmdCallback,
+    sub2 = nh.subscribe("/cmd_vel", 500, &Everything::cmdCallback,
                                             &container);
 
     cout << "Subscribers have been initialized." << endl;
