@@ -65,7 +65,8 @@ Particle randomParticle() {
 }
 
 void checkBounds(vector<Particle> &belief) {
-    for (int i = belief.size() - 1; i >= 0; i--) 
+    int size = belief.size();
+    for (int i = 0; i < size; i++) 
     {
         float curx = belief[i].getPos().x;
         float cury = belief[i].getPos().y;
@@ -191,6 +192,8 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     }
 
     checkBounds(belief);
+
+    cout << "Finished CGR fxn" << endl;
 }
 
 

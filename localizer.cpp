@@ -49,16 +49,13 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
 
     // PointCloud<PointXYZ>::Ptr my_cloud_ptr(new PointCloud<PointXYZ>, null_deleter());
 
-    // PointCloud<PointXYZ>::Ptr my_cloud_ptr(new PointCloud<PointXYZ>());
-    // my_cloud = *my_cloud_ptr;
-
     PointCloud<PointXYZ> my_cloud;
+    // my_cloud = *my_cloud_ptr;
 
     pcl::fromROSMsg(msg, my_cloud);
 
-    PointCloud<PointXYZ>::Ptr my_cloud_ptr;
-    my_cloud_ptr.reset (new PointCloud<PointXYZ> (my_cloud)); 
-    
+    PointCloud<PointXYZ>::Ptr my_cloud_ptr (new PointCloud<PointXYZ> (my_cloud)); 
+
     PointCloud<PointXYZ> PlanePoints;
     PointCloud<PointXY> PlaneNorms;
 
@@ -68,7 +65,8 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
 
     cout << "finised fspf" << endl;
 
-    if (belief.size() == 0) {
+    int beliefsize = belief.size();
+    if (beliefsize == 0) {
         // create random belief
         // Room corners: (0, 0) to (10.2, 7.6)
         for (int i = 0; i < PARTICLE_NUM; i++) {

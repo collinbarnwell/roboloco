@@ -18,7 +18,8 @@ using namespace pcl;
 
 
 void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ>::Ptr my_cloud_ptr, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
-// void fspf(PointCloud<PointXYZ> &my_cloud, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
+
+    // void fspf(PointCloud<PointXYZ> &my_cloud, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
 
     // PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud); // possibly trying to be freed
 
@@ -69,24 +70,25 @@ void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ>::Ptr my_cloud_ptr,
         // ExtractIndices<PointXYZ> BPPfilter;        
         // BPPfilter.setInputCloud(rangeptr);
 
-        if (range.size() < NEIGH_DENSITY) { continue; }
+        int rangesize = range.size();
+        if (rangesize < NEIGH_DENSITY) { continue; }
 
         for (int i = 0; i < LOCAL_SAMPS; i++) {
             // pick 2 more points
-            PointXYZ b = range[rand()%range.size()];
-            PointXYZ c = range[rand()%range.size()];
+            PointXYZ b = range[rand()%rangesize];
+            PointXYZ c = range[rand()%rangesize];
 
             // make a plane
             Normal norm = planeNorm(a, b, c);
 
             // find points inliers
             vector<int> inlierIndices;
-            for (int j = 0; j < range.size(); j++) {
+            for (int j = 0; j < rangesize; j++) {
                 int currIndex = pointIdxRadiusSearch[j];
                 PointXYZ currpoint = my_cloud[currIndex]; // make sure these are proper indices
                 float pdst = planeToPtDist(currpoint, a, norm);
                 if (pdst <= PLANE_OFFSET) {
-                    inlierIndices.push_back(currIndex);
+                    inlierIndices.push_back(currIndex); // problems
                 }
             }
 
@@ -101,7 +103,8 @@ void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ>::Ptr my_cloud_ptr,
 
                 BPP.clear();
 
-                for (int q = 0; q < inlierIndices.size(); q++) 
+                int maxq = inlierIndices.size();
+                for (int q = 0; q < maxq; q++) 
                 {
                     int ind = inlierIndices[q];
                     BPP.push_back(my_cloud.points[ind]);
@@ -123,7 +126,8 @@ void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ>::Ptr my_cloud_ptr,
             // declare temporary normals vector
             PointCloud<PointXY> normals;
 
-            for (int i = 0; i < BPP.size(); i++) {
+            int bppsize = BPP.size();
+            for (int i = 0; i < bppsize; i++) {
                 // calculate 2D-projected normal of BPP
                 PointXY newpoint = projectNorm(bestNorm);
                 normals.push_back(newpoint);

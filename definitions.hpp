@@ -8,8 +8,8 @@
 
 // **** FSPF
 
-#define MAX_HOODS 3000 // kmax
-#define MAX_PTS 20000 // nmax
+#define MAX_HOODS 1000 // kmax 3000
+#define MAX_PTS 10000 // nmax 20000
 #define LOCAL_SAMPS 80 // (l) num local samples
 // #define PLANE_SIZE .5 // S
 #define PLANE_OFFSET .03 // e
