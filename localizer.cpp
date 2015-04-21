@@ -16,15 +16,27 @@ ros::Subscriber sub, sub2;
 class Everything 
 {
     private:
-        pcl::PointCloud<pcl::PointXYZ> my_cloud;
-        // PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud_global);
+        // PointCloud<PointXYZ> my_cloud;
+        // PointCloud<PointXYZ>::Ptr my_cloud_ptr;
 
         MovementKeeper myMoves;
         vector<Particle> belief;
     public:
+        // Everything();
+        // void updateCloud(PointCloud<PointXYZ> cld);
         void pointcloudCallback(const sensor_msgs::PointCloud2 msg);
         void cmdCallback(const geometry_msgs::Twist& vel_cmd);
 };
+
+// Everything::Everything() {
+//     my_cloud_ptr = PointCloud<PointXYZ>::Ptr(new PointCloud<PointXYZ>,null_deleter());
+//     my_cloud = *my_cloud_ptr;
+// }
+
+// void Everything::updateCloud(PointCloud<PointXYZ> cld) {
+//     my_cloud.clear();
+//     my_cloud += cld; 
+// }
 
 void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg) 
 {
@@ -33,14 +45,25 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
     ros::Time::init();
     myMoves.initTime();
 
+    // PointCloud<PointXYZ> receiver_cloud;
+
+    // PointCloud<PointXYZ>::Ptr my_cloud_ptr(new PointCloud<PointXYZ>, null_deleter());
+
+    // PointCloud<PointXYZ>::Ptr my_cloud_ptr(new PointCloud<PointXYZ>());
+    // my_cloud = *my_cloud_ptr;
+
+    PointCloud<PointXYZ> my_cloud;
+
     pcl::fromROSMsg(msg, my_cloud);
 
+    PointCloud<PointXYZ>::Ptr my_cloud_ptr;
+    my_cloud_ptr.reset (new PointCloud<PointXYZ> (my_cloud)); 
+    
     PointCloud<PointXYZ> PlanePoints;
     PointCloud<PointXY> PlaneNorms;
 
     cout << "before fspf" << endl;
 
-    PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud);
     fspf(my_cloud, my_cloud_ptr, PlanePoints, PlaneNorms);
 
     cout << "finised fspf" << endl;

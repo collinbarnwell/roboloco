@@ -18,8 +18,13 @@ using namespace pcl;
 
 
 void fspf(PointCloud<PointXYZ> my_cloud, PointCloud<PointXYZ>::Ptr my_cloud_ptr, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
+// void fspf(PointCloud<PointXYZ> &my_cloud, PointCloud<PointXYZ> &PlanePoints, PointCloud<PointXY> &PlanePointsNormals) {
 
     // PointCloud<PointXYZ>::Ptr my_cloud_ptr(&my_cloud); // possibly trying to be freed
+
+    // PointCloud<PointXYZ> my_cloud = *my_cloud_ptr;
+    // PointCloud<PointXYZ>::Ptr my_cloud_ptr = my_cloud.makeShared();
+
 
     PointCloud<PointXYZ> range;
     // PointCloud<PointXYZ>::Ptr rangeptr(&range);    // problem
