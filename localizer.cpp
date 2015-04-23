@@ -16,27 +16,12 @@ ros::Subscriber sub, sub2;
 class Everything 
 {
     private:
-        // PointCloud<PointXYZ> my_cloud;
-        // PointCloud<PointXYZ>::Ptr my_cloud_ptr;
-
         MovementKeeper myMoves;
         vector<Particle> belief;
     public:
-        // Everything();
-        // void updateCloud(PointCloud<PointXYZ> cld);
         void pointcloudCallback(const sensor_msgs::PointCloud2 msg);
         void cmdCallback(const geometry_msgs::Twist& vel_cmd);
 };
-
-// Everything::Everything() {
-//     my_cloud_ptr = PointCloud<PointXYZ>::Ptr(new PointCloud<PointXYZ>,null_deleter());
-//     my_cloud = *my_cloud_ptr;
-// }
-
-// void Everything::updateCloud(PointCloud<PointXYZ> cld) {
-//     my_cloud.clear();
-//     my_cloud += cld; 
-// }
 
 void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg) 
 {
@@ -94,11 +79,11 @@ void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg)
 void Everything::cmdCallback(const geometry_msgs::Twist& vel_cmd) 
 {
     myMoves.makeMoves(vel_cmd.linear.x, vel_cmd.angular.z);
-    cout << "Just moved." << endl;
+    // cout << "Just moved." << endl;
 }
 
 
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
     Everything container;
 
@@ -110,7 +95,7 @@ int main(int argc, char** argv)
                                         &Everything::pointcloudCallback,
                                         &container);
 
-    sub2 = nh.subscribe("/cmd_vel", 500, &Everything::cmdCallback,
+    sub2 = nh.subscribe("/cmd_vel", 1000, &Everything::cmdCallback,
                                             &container);
 
     cout << "Subscribers have been initialized." << endl;

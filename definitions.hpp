@@ -28,7 +28,7 @@
 #define ANGLE_VARIANCE 0.17 // in rads = ~10 degrees
 #define DIST_VARIANCE 0.3 // in meters
 
-#define PARTICLE_NUM 200
+#define PARTICLE_NUM 20
 
 // Maximum error in normal angles to include a point
 #define MAX_NORMAL_DIFF 0.0872 // 0.0872 = 5 degrees

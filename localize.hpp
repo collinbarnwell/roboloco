@@ -10,21 +10,29 @@ using namespace pcl;
 
 class Particle {
     public:
+        Particle() {};
         Particle(PointXY pos, float angle);
         void setWeight(float w);
         float getWeight() const;
-        PointXY getPos();
-        float getAngle();
+        PointXY getPos() const;
+        float getAngle() const;
         void moveP(float x, float y, float ang);
+        void print();
+        // Note reversal: geq is opposite of < for descending order sort
+        bool operator<(const Particle p) const { return weight >= p.getWeight(); }
     private:
-        float weight;
         PointXY pos;
+        float weight;
         float angle;
 };
 
 Particle::Particle(PointXY p, float a) {
     pos = p;
     angle = a;
+}
+
+void Particle::print() {
+    cout << "Particle=>  pos: " << pos.x << "," << pos.y << " ;  angle:" << angle << endl;
 }
 
 void Particle::setWeight(float w) {
@@ -35,11 +43,11 @@ float Particle::getWeight() const {
     return weight;
 }
 
-PointXY Particle::getPos() {
+PointXY Particle::getPos() const {
     return pos;
 }
 
-float Particle::getAngle() {
+float Particle::getAngle() const {
     return angle;
 }
 
@@ -49,9 +57,23 @@ void Particle::moveP(float x, float y, float ang) {
     pos.y += y;
 }
 
-bool operator<(const Particle& p1, const Particle& p2) {
-    // Note reversal:  geq is opposite of < for descending order sort
-    return (p1.getWeight() >= p2.getWeight());
+void bubbleSort(vector<Particle> &arr) { // could do better
+    int n = arr.size();
+    bool swapped = true;
+    int j = 0;
+    Particle tmp;
+    while (swapped) {
+        swapped = false;
+        j++;
+        for (int i = 0; i < n - j; i++) {
+            if (arr[i].getWeight() < arr[i + 1].getWeight()) {
+                tmp = arr[i];
+                arr[i] = arr[i + 1];
+                arr[i + 1] = tmp;
+                swapped = true;
+            }
+        }
+    }
 }
 
 // CGR /////////////////////////////////////
@@ -81,7 +103,8 @@ void checkBounds(vector<Particle> &belief) {
 
 void motionEvolve(vector<Particle> &belief, MovementKeeper mk) 
 {
-    for (int i = 0; i < belief.size(); i++) 
+    int beliefsize = belief.size();
+    for (int i = 0; i < beliefsize; i++) 
     {
         belief[i].moveP(mk.getXPos(), mk.getYPos(), mk.getAngle());
     }
@@ -154,8 +177,7 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
         belief[i].setWeight(obsLikelihood);
     }
 
-    // Sort particles in descending order by weight
-    sort(belief.begin(), belief.end()); // seg fault
+    bubbleSort(belief);
 
     // Print best guess
     cout << "------------------------" << endl;
@@ -163,10 +185,11 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     cout << "Position-x: " << belief[0].getPos().x << endl;
     cout << "Position-y: " << belief[0].getPos().y << endl;
     cout << "Angle: " << belief[0].getAngle() << endl;
+    cout << "Weight: " << belief[0].getWeight() << endl;
     cout << "------------------------" << endl;
 
     // choose best KEEP_RATIO percent, create NEW_SAMPS new samples near each
-    int keepers = KEEP_RATIO * belief.size();
+    int keepers = KEEP_RATIO * beliefsize;
 
     for (int i = 0; i < keepers; i++) 
     {
@@ -187,7 +210,7 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     }
 
     // Add in remaining percentage random particles
-    for (int i = keepers*NEW_SAMPS; i < belief.size(); i++) {
+    for (int i = keepers*NEW_SAMPS; i < beliefsize; i++) {
         belief[i] = randomParticle();
     }
 
