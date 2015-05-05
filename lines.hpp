@@ -2,6 +2,8 @@
 #define LINES_N_STUFF
 
 #include "basic_utilities.hpp"
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace pcl;
@@ -185,6 +187,45 @@ bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
     else {
         return false;
     }
+}
+
+void svgPrint(vector<Line> lines)
+{
+    int imgsize = 800;
+
+    ofstream f;
+    f.open ("plot.html");
+
+    f << "<!DOCTYPE html><html><body><svg version=\"1.1\""
+        << "baseProfile=\"full\" width=\"" 
+        << imgsize << "\" height=\"" 
+        << imgsize << "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+
+
+    int linesize = lines.size();
+    for (int i = 0; i < linesize; i++)
+    {
+        float k = 800.0/(10.5 + 1.5);
+
+        int x1 = lines[i].getStart().x * k;
+        int x2 = lines[i].getEnd().x * k;
+        int y1 = (lines[i].getStart().y + 1.5) * k;
+        int y2 = (lines[i].getEnd().y + 1.5) * k;
+
+        int r = rand()%255;
+        int g = rand()%255;
+        int b = rand()%255;
+
+        f << "<line x1=\"" << x1 << "\" y1=\"" << y1
+            << "\" x2=\"" << x2 << "\" y2=\"" << y2
+            << "\" style=\"stroke:rgb(" 
+            << r << "," << g << "," << b 
+            << ");stroke-width:2\" />\n";
+    }
+
+    f << "\n</svg></body></html>";
+
+    f.close();
 }
 
 

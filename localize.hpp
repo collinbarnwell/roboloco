@@ -134,8 +134,13 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     for (int i = 0; i < beliefsize; i++)
     // iterating through particles in belief to calculate p - belief index is i
     {
-        vector<Line> raycastMap;
-        AnalyticRayCast(belief[i].getPos(), map, raycastMap);
+        int pointsin = 0;
+        int pointsout = 0;
+
+        vector<Line> raycastMap = AnalyticRayCast(belief[i].getPos(), map);
+        int raycastmapsize = raycastMap.size();
+        
+        cout << raycastmapsize << endl; // BUG: Between 4 and 16 (of 25)
 
         float obsLikelihood = 1.0;
 
@@ -151,28 +156,40 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
             PointXY intersection;
 
+            int oldpointsin = pointsin;
+
+            for (int k = 0; k < raycastmapsize; k++)
             // iterate through viewable lines raycasted map - line index is k
-            int raycastmapsize = raycastMap.size();
-            for (int k = 0; k < raycastmapsize; k++) 
             {
-                if (toCloudpt.intersectOutOfBound(raycastMap[k], &intersection)) {
+                if (toCloudpt.intersectOutOfBound(raycastMap[k], &intersection) || 
+                    toCloudpt.intersect(raycastMap[k], &intersection)) 
+                {
                     Line wall = raycastMap[k];
 
                     // convert normal from robot-space to map-space
                     PointXY n = convertNorm(normals[j], belief[i].getAngle());
 
                     // calculate angle between map-space point normal n (0, 0) to (<PointXY>) and wall normal (Line)
+                    
                     if (wall.angleAboveMax(n, MAX_NORMAL_DIFF)) {
                         float di2 = dst2dsqd(intersection, cloudpt);
                         // **TODO: consider introducing MAX_DIST for di2
-                        obsLikelihood *= exp(-di2/KONSTANT);
+                        // TODO: Need to have minimum # pts included to keep
+                        obsLikelihood = obsLikelihood * exp(-di2/KONSTANT);
+                        pointsin++;
+                        // cout << exp(-di2/KONSTANT) << ", ";
                     }
 
                     // found corresponding wall; break out of loop
                     break;
                 }
             }
+            if (pointsin == oldpointsin) {
+                pointsout++;
+            }
         }
+
+        cout << "B: " << obsLikelihood << ", IN: " << pointsin << ", OUT: " << pointsout << endl;
 
         belief[i].setWeight(obsLikelihood);
     }
@@ -190,6 +207,7 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
     // choose best KEEP_RATIO percent, create NEW_SAMPS new samples near each
     int keepers = KEEP_RATIO * beliefsize;
+
 
     for (int i = 0; i < keepers; i++) 
     {
