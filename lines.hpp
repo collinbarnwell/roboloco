@@ -4,6 +4,8 @@
 #include "basic_utilities.hpp"
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 using namespace pcl;
@@ -189,23 +191,29 @@ bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
     }
 }
 
-void svgPrint(vector<Line> lines)
+void svgPrint(vector<Line> lines, int namenum, PointXY p)
 {
     int imgsize = 800;
+    float k = float(imgsize)/12.5;
+
+    stringstream oss;
+    oss << namenum << "plot.html";
+    string filename = oss.str();
 
     ofstream f;
-    f.open ("plot.html");
+    f.open(filename.c_str());
 
     f << "<!DOCTYPE html><html><body><svg version=\"1.1\""
         << "baseProfile=\"full\" width=\"" 
         << imgsize << "\" height=\"" 
-        << imgsize << "\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+        << imgsize << "\" xmlns=\"http://www.w3.org/2000/svg\">\n\n";
 
+    f << "<circle cx=\"" << int(p.x * k) << "\" cy=\"" << int(p.y * k)
+        << "\" r=\"5\" fill=\"green\" />\n\n";
 
     int linesize = lines.size();
     for (int i = 0; i < linesize; i++)
     {
-        float k = 800.0/(10.5 + 1.5);
 
         int x1 = lines[i].getStart().x * k;
         int x2 = lines[i].getEnd().x * k;

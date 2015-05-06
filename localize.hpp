@@ -123,12 +123,6 @@ PointXY convertNorm(PointXY p, float ang) {
 
 void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointCloud<PointXY> normals, vector<Line> map)
 {
-    // TODO: Move this to main after #definitions are abstracted
-    if (KEEP_RATIO * (NEW_SAMPS + 1) > 1.0) {
-        cout << "!! KEEP_RATIO is too big for NEW_SAMPS value !!" << endl;
-        return;
-    }
-
     int beliefsize = belief.size();
 
     for (int i = 0; i < beliefsize; i++)
@@ -139,6 +133,8 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
         vector<Line> raycastMap = AnalyticRayCast(belief[i].getPos(), map);
         int raycastmapsize = raycastMap.size();
+
+        svgPrint(raycastMap, i, belief[i].getPos());
         
         cout << raycastmapsize << endl; // BUG: Between 4 and 16 (of 25)
 
