@@ -166,11 +166,11 @@ bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
 
     float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
     
-    bool within_l = ((x >= l.getStart().x && x <= l.getEnd().x) || (x <= l.getStart().x && x >= l.getEnd().x));
-    within_l = within_l || veryCloseTo(x, l.getStart().x) || veryCloseTo(x, l.getEnd().x);
+    bool within_l = ((x >= l.getStart().x && x <= l.getEnd().x) || (x <= l.getStart().x && x >= l.getEnd().x)
+                        || veryCloseTo(x, l.getStart().x) || veryCloseTo(x, l.getEnd().x));
 
-    bool not_within_self = (x >= start.x && x >= end.x) || (x <= start.x && x <= end.x);
-    not_within_self = not_within_self || veryCloseTo(x, end.x) || veryCloseTo(x, start.x);
+    bool not_within_self = ((x >= start.x && x >= end.x) || (x <= start.x && x <= end.x)
+                             || veryCloseTo(x, end.x) || veryCloseTo(x, start.x));
 
     if (within_l && not_within_self)
     {
@@ -208,7 +208,7 @@ void svgPrint(vector<Line> lines, int namenum, PointXY p)
         << imgsize << "\" height=\"" 
         << imgsize << "\" xmlns=\"http://www.w3.org/2000/svg\">\n\n";
 
-    f << "<circle cx=\"" << int(p.x * k) << "\" cy=\"" << int(p.y * k)
+    f << "<circle cx=\"" << int(p.x * k) << "\" cy=\"" << 800 - int(p.y * k)
         << "\" r=\"5\" fill=\"green\" />\n\n";
 
     int linesize = lines.size();
@@ -217,18 +217,18 @@ void svgPrint(vector<Line> lines, int namenum, PointXY p)
 
         int x1 = lines[i].getStart().x * k;
         int x2 = lines[i].getEnd().x * k;
-        int y1 = (lines[i].getStart().y + 1.5) * k;
-        int y2 = (lines[i].getEnd().y + 1.5) * k;
+        int y1 = 800 - (lines[i].getStart().y + 1.5) * k;
+        int y2 = 800 - (lines[i].getEnd().y + 1.5) * k;
 
         int r = rand()%255;
         int g = rand()%255;
-        int b = rand()%255;
+        int b = rand()%175 + 80;
 
         f << "<line x1=\"" << x1 << "\" y1=\"" << y1
             << "\" x2=\"" << x2 << "\" y2=\"" << y2
             << "\" style=\"stroke:rgb(" 
             << r << "," << g << "," << b 
-            << ");stroke-width:2\" />\n";
+            << ");stroke-width:3\" />\n";
     }
 
     f << "\n</svg></body></html>";

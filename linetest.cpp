@@ -9,87 +9,69 @@ int main(int argc, char** argv) {
     PointXY erstart, erend, eestart, eeend, eye;
     vector<Line> lineList;
 
-    // _____
-    // ___
-    // x
-
-    erstart.x = 1;
+    erstart.x = 2;
     erstart.y = .5;
-
-    erend.x = 0;
+    erend.x = 3;
     erend.y = .5;
 
     Line occluder(erstart, erend);
 
-    eestart.x = 0.0;
+    eestart.x = 6.0;
     eestart.y = 2.0;
-    eeend.x = 2.0;
+    eeend.x = 0.0;
     eeend.y = 2.0;
 
     Line occludee(eestart, eeend);
 
-    eye.x = 0.0;
+    eye.x = 3.0;
     eye.y = 0.0;
 
+    lineList.push_back(occludee);
+    lineList.push_back(occluder);
+    svgPrint(lineList, -5, eye);
+    lineList.clear();
 
     TrimOcclusion(eye, occludee, occluder, lineList);
 
-    cout << "Occluder=> ";
-    occluder.print();
-    cout << "Occludee=> ";
-    occludee.print();
+    lineList.push_back(occludee);
+    lineList.push_back(occluder);
 
-    cout << "Linelist size: " << lineList.size() << endl;
+    svgPrint(lineList, -4, eye);
 
-    if (lineList.size() > 0) {
-        cout << "First line in lineList=> ";
-        lineList.at(0).print();
-    }
+    ///////////////////////////////////////
 
-    cout << endl;
+    // lineList.clear();
 
-    //    _____
-    // ___
-    //
-    //    x
+    // erstart.x = 1;
+    // erstart.y = 2;
 
-    lineList.clear();
+    // erend.x = 0;
+    // erend.y = 2;
 
-    erstart.x = 1;
-    erstart.y = 2;
+    // occluder.setStart(erstart);
+    // occluder.setEnd(erend);
 
-    erend.x = 0;
-    erend.y = 2;
+    // eestart.x = 2.0;
+    // eestart.y = 2.0;
+    // eeend.x = 0.0;
+    // eeend.y = 2.0;
 
-    occluder.setStart(erstart);
-    occluder.setEnd(erend);
+    // Line occludee2(eestart, eeend);
 
-    eestart.x = 0.0;
-    eestart.y = 2.0;
-    eeend.x = -2.0;
-    eeend.y = 2.0;
+    // eye.x = 2.0;
+    // eye.y = 0.0;
 
-    Line occludee2(eestart, eeend);
+    // lineList.push_back(occludee);
+    // lineList.push_back(occluder);
+    // svgPrint(lineList, -2, eye);
+    // lineList.clear();
 
-    eye.x = 0.0;
-    eye.y = 0.0;
+    // TrimOcclusion(eye, occludee2, occluder, lineList);
 
+    // lineList.push_back(occludee);
+    // lineList.push_back(occluder);
 
-    TrimOcclusion(eye, occludee2, occluder, lineList);
-
-    cout << "Occluder=> ";
-    occluder.print();
-    cout << "Occludee=> ";
-    occludee2.print();
-
-    cout << "Linelist size: " << lineList.size() << endl;
-
-    if (lineList.size() > 0) {
-        cout << "First line in lineList=> ";
-        lineList.at(0).print();
-    }
-
-    cout << endl;
+    // svgPrint(lineList, -3, eye);
 
     return 0;
 }

@@ -43,9 +43,11 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
     }
     if (to_occluder_start.intersectOutOfBound(occludee, &poi1)) {
         pois.push_back(poi1);
+        cout << "occluders start" << endl;
     }
     if (to_occluder_end.intersectOutOfBound(occludee, &poi2)) {
         pois.push_back(poi2);
+        cout << "occluders end" << endl;
     }
 
     // cout << "POIS SIZE: " << pois.size() << endl;
@@ -56,6 +58,8 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
     if (pois.size() < 1) {
         return;
     }
+
+    cout << pois.size() << endl;
 
     // 1) find unoccluded endpt, keep until closest poi/endpt 
     // 2) throw away until following poi/endpt
@@ -82,6 +86,7 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
 
     // add possible disconnected segment to lineList
     if (pois.size() > 1) {
+        cout << "aiaiai" << endl;
         PointXY new_line_start = pois.back();
         pois.pop_back();
         Line new_line(new_line_start, pois.back());

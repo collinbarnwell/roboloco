@@ -124,6 +124,8 @@ PointXY convertNorm(PointXY p, float ang) {
 void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointCloud<PointXY> normals, vector<Line> map)
 {
     int beliefsize = belief.size();
+    svgPrint(map, -1, belief[0].getPos());
+
 
     for (int i = 0; i < beliefsize; i++)
     // iterating through particles in belief to calculate p - belief index is i
