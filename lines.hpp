@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "intersect.hpp"
 
 using namespace std;
 using namespace pcl;
@@ -105,90 +106,51 @@ void Line::set_to_zero() {
     is_zero = true;
 }
 
-bool Line::intersect(Line l, PointXY* intersection) {
-    if (l.isZero() || isZero()) return false;
-
-    float slopeme, slopel;
-
-    if ((l.getEnd().x - l.getStart().x) == 0) {
-        slopel = (l.getEnd().y - l.getStart().y)*INF;
-    } else {
-        slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
-    }
-
-    if ((end.x - start.x) == 0) {
-        slopeme = (end.y - start.y)*INF;
-    } else {
-        slopeme = (end.y - start.y)/(end.x - start.x);
-    }
-    
-    float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
-
-    bool within_l = ((x >= l.getStart().x && x <= l.getEnd().x) || (x <= l.getStart().x && x >= l.getEnd().x));
-    bool within_self = (x >= start.x && x <= end.x) || (x <= start.x && x >= end.x);
-
-    if (within_self && within_l)
-    {
-        PointXY p;
-        p.x = x;
-        p.y = slopeme*(x - start.x) + start.y;
-        *intersection = p;
-
-        // cout << "INTERSECTION DETECTED (self, l): " << endl;
-        // print();
-        // l.print();
-        // cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
-
-        return true;
-    }
-    else {
-        return false;
-    }
+bool Line::intersect(Line l, PointXY* intersection) 
+{
+    return doIntersect(l.getStart(), l.getEnd(), start, end);
 }
 
-// test if intersects with l, even if intersection is outside of self
-bool Line::intersectOutOfBound(Line l, PointXY* intersection) {
-    if (l.isZero() || isZero()) return false;
 
-    float slopeme, slopel;
+// help from: http://stackoverflow.com/questions/14307158
+// /how-do-you-check-for-intersection-between-a-line-segment-and-a-line-ray-emanatin
+// and 
+// http://stackoverflow.com/questions/563198
+// /how-do-you-detect-where-two-line-segments-intersect/565282#565282
+bool Line::intersectOutOfBound(Line l, PointXY* intersection) 
+// Tests if intersects with l, even if intersection is outside of self
+{
+    // want to find t & u for: (p)start + t*<r> = (q)l.getStart() + u*<s>
+    PointXYZ s, r, pq;
+    s.x = l.getStart().x - l.getEnd().x;
+    s.y = l.getStart().y - l.getEnd().y;
+    s.z = 0;
 
-    if ((l.getEnd().x - l.getStart().x) == 0) {
-        slopel = (l.getEnd().y - l.getStart().y)*INF;
-    } else {
-        slopel = (l.getEnd().y - l.getStart().y)/(l.getEnd().x - l.getStart().x);
-    }
+    r.x = end.x - start.x;
+    r.y = end.y - start.y;
+    r.z = 0;
 
-    if ((end.x - start.x) == 0) {
-        slopeme = (end.y - start.y)*INF;
-    } else {
-        slopeme = (end.y - start.y)/(end.x - start.x);
-    }
+    // t = (l.getStart() − start) × s / (r × s)
+    // u = (l.getStart() − start) × r / (r × s)s
+    pq.x = l.getStart().x - start.x;
+    pq.y = l.getStart().y - start.y;
+    pq.z = 0;
 
-    float x = (-slopel*l.getStart().x + l.getStart().y - start.y + start.x * slopeme)/(slopeme - slopel);
-    
-    bool within_l = ((x >= l.getStart().x && x <= l.getEnd().x) || (x <= l.getStart().x && x >= l.getEnd().x)
-                        || veryCloseTo(x, l.getStart().x) || veryCloseTo(x, l.getEnd().x));
+    float rxs = magnitude(crossp( r, s ));
+    float t = magnitude(crossp( pq, s )) / rxs;
+    float u = magnitude(crossp( pq, r )) / rxs;
 
-    bool not_within_self = ((x >= start.x && x >= end.x) || (x <= start.x && x <= end.x)
-                             || veryCloseTo(x, end.x) || veryCloseTo(x, start.x));
-
-    if (within_l && not_within_self)
-    {
-        PointXY p;
-        p.x = x;
-        p.y = slopeme*(x - start.x) + start.y;
-        *intersection = p;
-
-        // cout << "INTERSECTION (out of bound) DETECTED (self, l): " << endl;
-        // print();
-        // l.print();
-        // cout << "at: " << intersection->x << "," << intersection->y << endl << endl;
-
-        return true;
-    }
-    else {
+    // behind start or within segment || outside of s
+    if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
         return false;
-    }
+
+    PointXY pi;
+    pi.x = start.x + t*r.x;
+    pi.y = start.y + t*r.y;
+
+    intersection = &pi;
+
+    return true;
 }
 
 void svgPrint(vector<Line> lines, int namenum, PointXY p)
