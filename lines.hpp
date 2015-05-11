@@ -6,7 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "intersect.hpp"
+// #include "intersect.hpp"
 
 using namespace std;
 using namespace pcl;
@@ -15,8 +15,8 @@ using namespace pcl;
 class Line {
     public:
         Line(PointXY s, PointXY e);
-        bool intersect(Line l, PointXY* intersection);
-        bool intersectOutOfBound(Line l, PointXY* intersection);
+        bool intersect(Line l, PointXY &intersection);
+        bool intersectOutOfBound(Line l, PointXY &intersection);
         PointXY getStart();
         PointXY getEnd();
         void setStart(PointXY s);
@@ -106,9 +106,35 @@ void Line::set_to_zero() {
     is_zero = true;
 }
 
-bool Line::intersect(Line l, PointXY* intersection) 
+bool Line::intersect(Line l, PointXY &intersection) 
 {
-    return doIntersect(l.getStart(), l.getEnd(), start, end);
+    PointXYZ s, r, pq;
+    s.x = l.getEnd().x - l.getStart().x;
+    s.y = l.getEnd().y - l.getStart().y;
+    s.z = 0.0;
+
+    r.x = end.x - start.x;
+    r.y = end.y - start.y;
+    r.z = 0.0;
+
+    // t = (l.getStart() − start) × s / (r × s)
+    // u = (l.getStart() − start) × r / (r × s)
+    pq.x = start.x - l.getStart().x;
+    pq.y = start.y - l.getStart().y;
+    pq.z = 0.0;
+
+    PointXYZ rxs = crossp( r, s );
+    float t = crossp( pq, s ).z / rxs.z;
+    float u = crossp( pq, r ).z / rxs.z;
+
+    // behind start or within segment || outside of s
+    if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
+        return false;
+
+    intersection.x = start.x + t*r.x;
+    intersection.y = start.y + t*r.y;
+
+    return true;
 }
 
 
@@ -117,44 +143,45 @@ bool Line::intersect(Line l, PointXY* intersection)
 // and 
 // http://stackoverflow.com/questions/563198
 // /how-do-you-detect-where-two-line-segments-intersect/565282#565282
-bool Line::intersectOutOfBound(Line l, PointXY* intersection) 
+bool Line::intersectOutOfBound(Line l, PointXY &intersection) 
 // Tests if intersects with l, even if intersection is outside of self
 {
     // want to find t & u for: (p)start + t*<r> = (q)l.getStart() + u*<s>
     PointXYZ s, r, pq;
-    s.x = l.getStart().x - l.getEnd().x;
-    s.y = l.getStart().y - l.getEnd().y;
-    s.z = 0;
+    s.x = l.getEnd().x - l.getStart().x;
+    s.y = l.getEnd().y - l.getStart().y;
+    s.z = 0.0;
 
     r.x = end.x - start.x;
     r.y = end.y - start.y;
-    r.z = 0;
+    r.z = 0.0;
 
     // t = (l.getStart() − start) × s / (r × s)
-    // u = (l.getStart() − start) × r / (r × s)s
-    pq.x = l.getStart().x - start.x;
-    pq.y = l.getStart().y - start.y;
-    pq.z = 0;
+    // u = (l.getStart() − start) × r / (r × s)
+    pq.x = start.x - l.getStart().x;
+    pq.y = start.y - l.getStart().y;
+    pq.z = 0.0;
 
-    float rxs = magnitude(crossp( r, s ));
-    float t = magnitude(crossp( pq, s )) / rxs;
-    float u = magnitude(crossp( pq, r )) / rxs;
+    PointXYZ rxs = crossp( r, s );
+    float t = crossp( pq, s ).z / rxs.z;
+    float u = crossp( pq, r ).z / rxs.z;
 
     // behind start or within segment || outside of s
     if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
         return false;
 
-    PointXY pi;
-    pi.x = start.x + t*r.x;
-    pi.y = start.y + t*r.y;
-
-    intersection = &pi;
+    intersection.x = start.x + t*r.x;
+    intersection.y = start.y + t*r.y;
 
     return true;
 }
 
 void svgPrint(vector<Line> lines, int namenum, PointXY p)
 {
+    p.x = 1.555;
+    p.y = 3.851;
+
+    srand (time(NULL));
     int imgsize = 800;
     float k = float(imgsize)/12.5;
 
@@ -166,6 +193,7 @@ void svgPrint(vector<Line> lines, int namenum, PointXY p)
     f.open(filename.c_str());
 
     f << "<!DOCTYPE html><html><body><svg version=\"1.1\""
+        << "style=\"background: black\" "
         << "baseProfile=\"full\" width=\"" 
         << imgsize << "\" height=\"" 
         << imgsize << "\" xmlns=\"http://www.w3.org/2000/svg\">\n\n";
@@ -182,9 +210,9 @@ void svgPrint(vector<Line> lines, int namenum, PointXY p)
         int y1 = 800 - (lines[i].getStart().y + 1.5) * k;
         int y2 = 800 - (lines[i].getEnd().y + 1.5) * k;
 
-        int r = rand()%255;
-        int g = rand()%255;
-        int b = rand()%175 + 80;
+        int r = rand()%175;
+        int g = rand()%175;
+        int b = rand()%175;
 
         f << "<line x1=\"" << x1 << "\" y1=\"" << y1
             << "\" x2=\"" << x2 << "\" y2=\"" << y2

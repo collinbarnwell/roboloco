@@ -10,16 +10,16 @@ int main(int argc, char** argv) {
     vector<Line> lineList;
 
     erstart.x = 2.0;
-    erstart.y = 10.0;
-    erend.x = 8.0;
-    erend.y = 7.0;
+    erstart.y = 4.0;
+    erend.x = 5.0;
+    erend.y = 5.0;
 
     Line occluder(erstart, erend);
 
-    eestart.x = 5.0;
-    eestart.y = 4.0;
-    eeend.x = 5.0;
-    eeend.y = 2.0;
+    eestart.x = 10.0;
+    eestart.y = 9.0;
+    eeend.x = 0.0;
+    eeend.y = 8.0;
 
     Line occludee(eestart, eeend);
 
@@ -28,22 +28,22 @@ int main(int argc, char** argv) {
 
     PointXY i, j, k, l;
 
-    cout << "regular intersection: " << occluder.intersect(occludee, &i) << endl;
-    cout << "regular intersection: " << occludee.intersect(occluder, &j) << endl;
-    cout << "occluder intersects w/ ee OB: " << occluder.intersectOutOfBound(occludee, &k) << endl;
-    cout << "occludee intersects w/ er OB: " << occludee.intersectOutOfBound(occluder, &l) << endl;
+    // cout << "regular intersection: " << occluder.intersect(occludee, &i) << endl;
+    // cout << "regular intersection: " << occludee.intersect(occluder, &j) << endl;
+    // cout << "occluder intersects w/ ee OB: " << occluder.intersectOutOfBound(occludee, &k) << endl;
+    // cout << "occludee intersects w/ er OB: " << occludee.intersectOutOfBound(occluder, &l) << endl;
 
     lineList.push_back(occludee);
     lineList.push_back(occluder);
     svgPrint(lineList, -5, eye);
-    // lineList.clear();
+    lineList.clear();
 
-    // TrimOcclusion(eye, occludee, occluder, lineList);
+    TrimOcclusion(eye, occludee, occluder, lineList);
 
-    // lineList.push_back(occludee);
-    // lineList.push_back(occluder);
+    lineList.push_back(occludee);
+    lineList.push_back(occluder);
 
-    // svgPrint(lineList, -4, eye);
+    svgPrint(lineList, -4, eye);
 
     ///////////////////////////////////////
 

@@ -3,8 +3,7 @@
 
 using namespace std;
 
-// Modified from: http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-
+// Mostly taken from: http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 
 // Given three colinear points p, q, r, the function checks if
 // point q lies on line segment 'pr'

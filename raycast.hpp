@@ -32,25 +32,21 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
     Line to_occluder_start(x, occluder.getStart());
     Line to_occluder_end(x, occluder.getEnd());
 
-    if (to_occludee_start.intersect(occluder, &ignore) && to_occludee_end.intersect(occluder, &ignore)) {
+    if (to_occludee_start.intersect(occluder, ignore) && to_occludee_end.intersect(occluder, ignore)) {
         // line is totally occluded
         occludee.set_to_zero();
         return;
     }
 
-    if (occludee.intersect(occluder, &intersection)) {
+    if (occludee.intersect(occluder, intersection)) {
         pois.push_back(intersection);
     }
-    if (to_occluder_start.intersectOutOfBound(occludee, &poi1)) {
+    if (to_occluder_start.intersectOutOfBound(occludee, poi1)) {
         pois.push_back(poi1);
-        cout << "occluders start" << endl;
     }
-    if (to_occluder_end.intersectOutOfBound(occludee, &poi2)) {
+    if (to_occluder_end.intersectOutOfBound(occludee, poi2)) {
         pois.push_back(poi2);
-        cout << "occluders end" << endl;
     }
-
-    // cout << "POIS SIZE: " << pois.size() << endl;
 
     // if at least one endpoint is clear ^^
     // and there are no pois ^
@@ -59,23 +55,28 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
         return;
     }
 
-    cout << pois.size() << endl;
-
     // 1) find unoccluded endpt, keep until closest poi/endpt 
     // 2) throw away until following poi/endpt
     // 3) repeat...
-    if (to_occludee_start.intersect(occluder, &ignore)) { // start is occluded
+
+    if (to_occludee_start.intersect(occluder, ignore)) 
+    // start is occluded
+    { 
         // start at end
         PointSorter psort(occludee.getEnd());
         sort(pois.begin(), pois.end(), psort);
 
         occludee.setStart(pois.back());
         pois.pop_back();
-    } else { // start is not occluded
+    } 
+    else 
+    // start is not occluded
+    {
         // add end to pois if also not occluded
-        if (!to_occluder_end.intersect(occluder, &ignore)) {
+        if (!to_occludee_end.intersect(occluder, ignore)) {
             pois.push_back(occludee.getEnd());
         }
+
         // start at start
         PointSorter psort(occludee.getStart());
         sort(pois.begin(), pois.end(), psort);
@@ -86,7 +87,6 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
 
     // add possible disconnected segment to lineList
     if (pois.size() > 1) {
-        cout << "aiaiai" << endl;
         PointXY new_line_start = pois.back();
         pois.pop_back();
         Line new_line(new_line_start, pois.back());
