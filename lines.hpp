@@ -6,7 +6,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-// #include "intersect.hpp"
 
 using namespace std;
 using namespace pcl;
