@@ -123,8 +123,6 @@ bool Line::intersect(Line l, PointXY &intersection)
     float t = crossp( pq, s ) / rxs;
     float u = crossp( pq, r ) / rxs;
 
-    cout << "t: " << t << " u: " << u << endl;
-
     // behind start or within segment || outside of s
     if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
         return false;
@@ -160,8 +158,6 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
     float rxs = crossp( r, s );
     float t = crossp( pq, s ) / rxs;
     float u = crossp( pq, r ) / rxs;
-
-    cout << "t: " << t << " u: " << u << endl;
 
     // behind start or within segment || outside of s
     if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
