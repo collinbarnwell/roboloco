@@ -4,77 +4,10 @@
 #include "definitions.hpp"
 #include "raycast.hpp"
 #include "movement_keeper.hpp"
+#include "particle.hpp"
 
 using namespace std;
 using namespace pcl;
-
-class Particle {
-    public:
-        Particle() {};
-        Particle(PointXY pos, float angle);
-        void setWeight(float w);
-        float getWeight() const;
-        PointXY getPos() const;
-        float getAngle() const;
-        void moveP(float x, float y, float ang);
-        void print();
-        // Note reversal: geq is opposite of < for descending order sort
-        bool operator<(const Particle p) const { return weight >= p.getWeight(); }
-    private:
-        PointXY pos;
-        float weight;
-        float angle;
-};
-
-Particle::Particle(PointXY p, float a) {
-    pos = p;
-    angle = a;
-}
-
-void Particle::print() {
-    cout << "Particle=>  pos: " << pos.x << "," << pos.y << " ;  angle:" << angle << endl;
-}
-
-void Particle::setWeight(float w) {
-    weight = w;
-}
-
-float Particle::getWeight() const {
-    return weight;
-}
-
-PointXY Particle::getPos() const {
-    return pos;
-}
-
-float Particle::getAngle() const {
-    return angle;
-}
-
-void Particle::moveP(float x, float y, float ang) {
-    angle += ang;
-    pos.x += x;
-    pos.y += y;
-}
-
-void bubbleSort(vector<Particle> &arr) { // could do better
-    int n = arr.size();
-    bool swapped = true;
-    int j = 0;
-    Particle tmp;
-    while (swapped) {
-        swapped = false;
-        j++;
-        for (int i = 0; i < n - j; i++) {
-            if (arr[i].getWeight() < arr[i + 1].getWeight()) {
-                tmp = arr[i];
-                arr[i] = arr[i + 1];
-                arr[i + 1] = tmp;
-                swapped = true;
-            }
-        }
-    }
-}
 
 // CGR /////////////////////////////////////
 
@@ -137,8 +70,6 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
         svgPrint(raycastMap, i, belief[i].getPos());
         
-        cout << raycastmapsize << endl; // BUG: Between 4 and 16 (of 25)
-
         float obsLikelihood = 1.0;
 
         int cloudsize = cloud.size();
@@ -186,12 +117,17 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
             }
         }
 
-        cout << "B: " << obsLikelihood << ", IN: " << pointsin << ", OUT: " << pointsout << endl;
+        // cout << "B: " << obsLikelihood << ", IN: " << pointsin << ", OUT: " << pointsout << endl;
 
         belief[i].setWeight(obsLikelihood);
+
+        if (pointsin < 10)
+            belief[i].setWeight(-1);
     }
 
     bubbleSort(belief);
+
+    particlePrint(belief, map);
 
     // Print best guess
     cout << "------------------------" << endl;
