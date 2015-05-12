@@ -9,10 +9,10 @@ int main(int argc, char** argv) {
     PointXY erstart, erend, eestart, eeend, eye;
     vector<Line> lineList;
 
-    erstart.x = 2.0;
-    erstart.y = 4.0;
-    erend.x = 5.0;
-    erend.y = 5.0;
+    erstart.x = 1.0;
+    erstart.y = 1.0;
+    erend.x = 8.0;
+    erend.y = 1.0;
 
     Line occluder(erstart, erend);
 

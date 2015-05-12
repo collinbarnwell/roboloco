@@ -121,7 +121,7 @@ bool Line::intersect(Line l, PointXY &intersection)
 
     float rxs = crossp( r, s );
 
-    if (rxs < 1/INFINITY) {
+    if (abs(rxs) < 1/1000) {
         // If r × s = 0 and (q − p) × r = 0, then the two lines are collinear.)
         // OR
         // If r × s = 0 and (q − p) × r ≠ 0, 
@@ -131,10 +131,6 @@ bool Line::intersect(Line l, PointXY &intersection)
 
     float t = crossp( pq, s ) / rxs;
     float u = crossp( pq, r ) / rxs;
-
-
-
-
 
     // behind start or within segment || outside of s
     if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
@@ -170,7 +166,7 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
 
     float rxs = crossp( r, s );
 
-    if (rxs < 1/INFINITY) {
+    if (abs(rxs) < 1/INFINITY) {
         // If r × s = 0 and (q − p) × r = 0, then the two lines are collinear.)
         // OR
         // If r × s = 0 and (q − p) × r ≠ 0, 
@@ -210,7 +206,7 @@ void svgPrint(vector<Line> lines, int namenum, PointXY p)
         << imgsize << "\" height=\"" 
         << imgsize << "\" xmlns=\"http://www.w3.org/2000/svg\">\n\n";
 
-    f << "<circle cx=\"" << int(p.x * k) << "\" cy=\"" << 800 - int(p.y * k)
+    f << "<circle cx=\"" << int(5 + p.x * k) << "\" cy=\"" << 795 - int((p.y+1.5) * k)
         << "\" r=\"5\" fill=\"green\" />\n\n";
 
     int linesize = lines.size();

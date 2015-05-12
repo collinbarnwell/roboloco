@@ -33,7 +33,7 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
     Line to_occluder_end(x, occluder.getEnd());
 
     if (to_occludee_start.intersect(occluder, ignore) && to_occludee_end.intersect(occluder, ignore)) {
-        // line is totally occluded
+        // line is totally occluded`
         occludee.set_to_zero();
         return;
     }
