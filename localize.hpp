@@ -126,7 +126,6 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     int beliefsize = belief.size();
     svgPrint(map, -1, belief[0].getPos());
 
-
     for (int i = 0; i < beliefsize; i++)
     // iterating through particles in belief to calculate p - belief index is i
     {
@@ -159,8 +158,8 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
             for (int k = 0; k < raycastmapsize; k++)
             // iterate through viewable lines raycasted map - line index is k
             {
-                if (toCloudpt.intersectOutOfBound(raycastMap[k], &intersection) || 
-                    toCloudpt.intersect(raycastMap[k], &intersection)) 
+                if (toCloudpt.intersectOutOfBound(raycastMap[k], intersection) || 
+                    toCloudpt.intersect(raycastMap[k], intersection)) 
                 {
                     Line wall = raycastMap[k];
 

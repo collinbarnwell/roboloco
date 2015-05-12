@@ -107,24 +107,23 @@ void Line::set_to_zero() {
 
 bool Line::intersect(Line l, PointXY &intersection) 
 {
-    PointXYZ s, r, pq;
+    PointXY s, r, pq;
     s.x = l.getEnd().x - l.getStart().x;
     s.y = l.getEnd().y - l.getStart().y;
-    s.z = 0.0;
 
     r.x = end.x - start.x;
     r.y = end.y - start.y;
-    r.z = 0.0;
 
     // t = (l.getStart() − start) × s / (r × s)
     // u = (l.getStart() − start) × r / (r × s)
-    pq.x = start.x - l.getStart().x;
-    pq.y = start.y - l.getStart().y;
-    pq.z = 0.0;
+    pq.x = l.getStart().x - start.x;
+    pq.y = l.getStart().y - start.y;
 
-    PointXYZ rxs = crossp( r, s );
-    float t = crossp( pq, s ).z / rxs.z;
-    float u = crossp( pq, r ).z / rxs.z;
+    float rxs = crossp( r, s );
+    float t = crossp( pq, s ) / rxs;
+    float u = crossp( pq, r ) / rxs;
+
+    cout << "t: " << t << " u: " << u << endl;
 
     // behind start or within segment || outside of s
     if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
@@ -146,24 +145,23 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
 // Tests if intersects with l, even if intersection is outside of self
 {
     // want to find t & u for: (p)start + t*<r> = (q)l.getStart() + u*<s>
-    PointXYZ s, r, pq;
+    PointXY s, r, pq;
     s.x = l.getEnd().x - l.getStart().x;
     s.y = l.getEnd().y - l.getStart().y;
-    s.z = 0.0;
 
     r.x = end.x - start.x;
     r.y = end.y - start.y;
-    r.z = 0.0;
 
     // t = (l.getStart() − start) × s / (r × s)
     // u = (l.getStart() − start) × r / (r × s)
-    pq.x = start.x - l.getStart().x;
-    pq.y = start.y - l.getStart().y;
-    pq.z = 0.0;
+    pq.x = l.getStart().x - start.x;
+    pq.y = l.getStart().y - start.y;
 
-    PointXYZ rxs = crossp( r, s );
-    float t = crossp( pq, s ).z / rxs.z;
-    float u = crossp( pq, r ).z / rxs.z;
+    float rxs = crossp( r, s );
+    float t = crossp( pq, s ) / rxs;
+    float u = crossp( pq, r ) / rxs;
+
+    cout << "t: " << t << " u: " << u << endl;
 
     // behind start or within segment || outside of s
     if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
@@ -177,9 +175,6 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
 
 void svgPrint(vector<Line> lines, int namenum, PointXY p)
 {
-    p.x = 1.555;
-    p.y = 3.851;
-
     srand (time(NULL));
     int imgsize = 800;
     float k = float(imgsize)/12.5;

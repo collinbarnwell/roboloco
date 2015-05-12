@@ -26,6 +26,10 @@ PointXYZ crossp(PointXYZ A, PointXYZ B) {
   return PointXYZ(x, y, z);
 }
 
+float crossp(PointXY A, PointXY B) {
+    return (A.x * B.y - A.y * B.x);
+}
+
 float dotp(PointXYZ a, PointXYZ b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
