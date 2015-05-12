@@ -120,8 +120,21 @@ bool Line::intersect(Line l, PointXY &intersection)
     pq.y = l.getStart().y - start.y;
 
     float rxs = crossp( r, s );
+
+    if (rxs < 1/INFINITY) {
+        // If r × s = 0 and (q − p) × r = 0, then the two lines are collinear.)
+        // OR
+        // If r × s = 0 and (q − p) × r ≠ 0, 
+        // then the two lines are parallel and non-intersecting.
+        return false;
+    }
+
     float t = crossp( pq, s ) / rxs;
     float u = crossp( pq, r ) / rxs;
+
+
+
+
 
     // behind start or within segment || outside of s
     if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
@@ -156,6 +169,15 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
     pq.y = l.getStart().y - start.y;
 
     float rxs = crossp( r, s );
+
+    if (rxs < 1/INFINITY) {
+        // If r × s = 0 and (q − p) × r = 0, then the two lines are collinear.)
+        // OR
+        // If r × s = 0 and (q − p) × r ≠ 0, 
+        // then the two lines are parallel and non-intersecting.
+        return false;
+    }
+
     float t = crossp( pq, s ) / rxs;
     float u = crossp( pq, r ) / rxs;
 
@@ -194,11 +216,13 @@ void svgPrint(vector<Line> lines, int namenum, PointXY p)
     int linesize = lines.size();
     for (int i = 0; i < linesize; i++)
     {
+        if (lines[i].isZero())
+            continue;
 
-        int x1 = lines[i].getStart().x * k;
-        int x2 = lines[i].getEnd().x * k;
-        int y1 = 800 - (lines[i].getStart().y + 1.5) * k;
-        int y2 = 800 - (lines[i].getEnd().y + 1.5) * k;
+        int x1 = 5 + lines[i].getStart().x * k;
+        int x2 = 5 + lines[i].getEnd().x * k;
+        int y1 = 795 - (lines[i].getStart().y + 1.5) * k;
+        int y2 = 795 - (lines[i].getEnd().y + 1.5) * k;
 
         int r = rand()%175;
         int g = rand()%175;
