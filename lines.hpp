@@ -121,7 +121,7 @@ bool Line::intersect(Line l, PointXY &intersection)
 
     float rxs = crossp( r, s );
 
-    if (abs(rxs) < 1/1000) {
+    if (abs(rxs) < 1/INFINITY) {
         // If r × s = 0 and (q − p) × r = 0, then the two lines are collinear.)
         // OR
         // If r × s = 0 and (q − p) × r ≠ 0, 
