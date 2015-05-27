@@ -81,7 +81,7 @@ void particlePrint(vector<Particle> b, vector<Line> lines)
     float k = float(imgsize)/12.5;
 
     ofstream f;
-    f.open("particles.html");
+    f.open("../plots/particles.html");
 
     f << "<!DOCTYPE html><html><body><svg version=\"1.1\""
         << "style=\"background: black\" "

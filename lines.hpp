@@ -194,7 +194,7 @@ void svgPrint(vector<Line> lines, int namenum, PointXY p)
     float k = float(imgsize)/12.5;
 
     stringstream oss;
-    oss << namenum << "plot.html";
+    oss << "../plots/" << namenum << "plot.html";
     string filename = oss.str();
 
     ofstream f;
