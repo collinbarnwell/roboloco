@@ -43,14 +43,8 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     for (int i = 0; i < beliefsize; i++)
     // iterating through particles in belief to calculate p - belief index is i
     {
-        // int pointsin = 0;
-        // int pointsout = 0;
-
         vector<Line> raycastMap = AnalyticRayCast(belief[i].getPos(), map);
         int raycastmapsize = raycastMap.size();
-
-        // if (i < 100)
-        //     svgPrint(raycastMap, i, belief[i].getPos());
         
         float obsLikelihood = 1.0;
 
@@ -91,17 +85,9 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
                     break;
                 }
             }
-            // if (pointsin == oldpointsin) {
-            //     pointsout++;
-            // }
         }
 
-        // cout << "B: " << obsLikelihood << ", IN: " << pointsin << ", OUT: " << pointsout << endl;
-
         belief[i].setWeight(obsLikelihood);
-
-        // if (pointsin < 10)
-        //     belief[i].setWeight(-1);
 
         totalWeight += obsLikelihood;
     }
@@ -128,34 +114,3 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
 
 #endif
-
-    /* TRASH ------------------>>>>>>
-
-    // choose best KEEP_RATIO percent, create NEW_SAMPS new samples near each
-    int keepers = KEEP_RATIO * beliefsize;
-
-    for (int i = 0; i < keepers; i++) 
-    {
-        // create NEW_SAMPS - 1, new particles near each keeper + keep self
-        // [k k ns ns ns ns space space space]
-
-        for (int j = 0; j < NEW_SAMPS; j++) 
-        {
-            PointXY x;
-            float angle = belief[i].getAngle() + fmod(rand(),ANGLE_VARIANCE) - (ANGLE_VARIANCE/2.0);
-            x.x = belief[i].getPos().x + fmod(rand(),DIST_VARIANCE) - (DIST_VARIANCE/2.0);
-            x.y = belief[i].getPos().y + fmod(rand(),DIST_VARIANCE) - (DIST_VARIANCE/2.0);
-
-            belief[keepers + i*NEW_SAMPS + j] = Particle(x, angle);
-            // last assigned is belief[keepers + (keepers-1)*NEW_SAMPS + (NEW_SAMPS-1) - 1]
-            // = belief[keepers*NEW_SAMPS - 1]
-        }
-    }
-
-    // Add in remaining percentage random particles
-    for (int i = keepers*NEW_SAMPS; i < beliefsize; i++) {
-        belief[i] = randomParticle();
-    }
-
-    checkBounds(belief);
-    */

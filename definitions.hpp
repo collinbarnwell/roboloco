@@ -40,11 +40,5 @@
 // #define DISCOUNT 10 // discounting factor f <- ??????????
 #define KONSTANT 800 // 2 * SIGMA^2 * f = .08
 
-
 #endif
 
-// Keep best KEEP_RATIO percentage of particles
-// #define KEEP_RATIO .1
-
-// Create NEW_SAMPS new samples based off of eac kept particle
-// #define NEW_SAMPS 7
