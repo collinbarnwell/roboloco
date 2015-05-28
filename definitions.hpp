@@ -40,5 +40,5 @@
 // #define DISCOUNT 10 // discounting factor f <- ??????????
 #define KONSTANT 800 // 2 * SIGMA^2 * f = .08
 
-#endif
 
+#endif
