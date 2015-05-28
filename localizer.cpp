@@ -24,13 +24,7 @@ class Everything
 };
 
 void Everything::pointcloudCallback(const sensor_msgs::PointCloud2 msg) 
-{
-    if (KEEP_RATIO * (NEW_SAMPS + 1) > 1.0) {
-        cout << "!! KEEP_RATIO is too big for NEW_SAMPS value !!" << endl;
-        return;
-    }
-
-    
+{   
     cout << "Pointcloud callback running..." << endl;
 
     ros::Time::init();

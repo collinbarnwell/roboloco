@@ -5,37 +5,17 @@
 #include "raycast.hpp"
 #include "movement_keeper.hpp"
 #include "particle.hpp"
+#include "new_samples.hpp"
 
 using namespace std;
 using namespace pcl;
 
 // CGR /////////////////////////////////////
 
-Particle randomParticle() {
-    PointXY pos;
-    pos.x = fmod(rand(), MAPMAXX);
-    pos.y = fmod(rand(), MAPMAXY);
-
-    return Particle( pos, fmod(rand(),(2 * PI)) );
-}
-
-void checkBounds(vector<Particle> &belief) {
-    int size = belief.size();
-    for (int i = 0; i < size; i++) 
-    {
-        float curx = belief[i].getPos().x;
-        float cury = belief[i].getPos().y;
-        if (curx > MAPMAXX || curx < 0 || cury > MAPMAXY || cury < 0) {
-            // if OB, replace wit random particle
-            belief[i] = randomParticle();
-
-            // belief.erase(belief.begin() + i);
-        }
-    }
-}
-
 void motionEvolve(vector<Particle> &belief, MovementKeeper mk) 
 {
+    cout << "Motion evolve x: " << mk.getXPos() 
+        << " Y: " << mk.getYPos() << "  Angle: " << mk.getAngle() << endl;
     int beliefsize = belief.size();
     for (int i = 0; i < beliefsize; i++) 
     {
@@ -58,17 +38,19 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 {
     int beliefsize = belief.size();
     svgPrint(map, -1, belief[0].getPos());
+    float totalWeight = 0.0;
 
     for (int i = 0; i < beliefsize; i++)
     // iterating through particles in belief to calculate p - belief index is i
     {
-        int pointsin = 0;
-        int pointsout = 0;
+        // int pointsin = 0;
+        // int pointsout = 0;
 
         vector<Line> raycastMap = AnalyticRayCast(belief[i].getPos(), map);
         int raycastmapsize = raycastMap.size();
 
-        svgPrint(raycastMap, i, belief[i].getPos());
+        // if (i < 100)
+        //     svgPrint(raycastMap, i, belief[i].getPos());
         
         float obsLikelihood = 1.0;
 
@@ -84,7 +66,7 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
             PointXY intersection;
 
-            int oldpointsin = pointsin;
+            // int oldpointsin = pointsin;
 
             for (int k = 0; k < raycastmapsize; k++)
             // iterate through viewable lines raycasted map - line index is k
@@ -101,31 +83,30 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
                     
                     if (wall.angleAboveMax(n, MAX_NORMAL_DIFF)) {
                         float di2 = dst2dsqd(intersection, cloudpt);
-                        // **TODO: consider introducing MAX_DIST for di2
-                        // TODO: Need to have minimum # pts included to keep
                         obsLikelihood = obsLikelihood * exp(-di2/KONSTANT);
-                        pointsin++;
-                        // cout << exp(-di2/KONSTANT) << ", ";
+                        // pointsin++;
                     }
 
                     // found corresponding wall; break out of loop
                     break;
                 }
             }
-            if (pointsin == oldpointsin) {
-                pointsout++;
-            }
+            // if (pointsin == oldpointsin) {
+            //     pointsout++;
+            // }
         }
 
         // cout << "B: " << obsLikelihood << ", IN: " << pointsin << ", OUT: " << pointsout << endl;
 
         belief[i].setWeight(obsLikelihood);
 
-        if (pointsin < 10)
-            belief[i].setWeight(-1);
+        // if (pointsin < 10)
+        //     belief[i].setWeight(-1);
+
+        totalWeight += obsLikelihood;
     }
 
-    bubbleSort(belief);
+    bubbleSort(belief); // lol
 
     particlePrint(belief, map);
 
@@ -138,9 +119,20 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     cout << "Weight: " << belief[0].getWeight() << endl;
     cout << "------------------------" << endl;
 
+    cout << "Resampling..." << endl;
+
+    belief = newSamples(belief, totalWeight);
+
+    cout << "Finished CGR fxn" << endl;
+}
+
+
+#endif
+
+    /* TRASH ------------------>>>>>>
+
     // choose best KEEP_RATIO percent, create NEW_SAMPS new samples near each
     int keepers = KEEP_RATIO * beliefsize;
-
 
     for (int i = 0; i < keepers; i++) 
     {
@@ -166,9 +158,4 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     }
 
     checkBounds(belief);
-
-    cout << "Finished CGR fxn" << endl;
-}
-
-
-#endif
+    */

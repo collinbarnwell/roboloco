@@ -28,7 +28,8 @@
 #define ANGLE_VARIANCE 0.17 // in rads = ~10 degrees
 #define DIST_VARIANCE 0.3 // in meters
 
-#define PARTICLE_NUM 1000
+#define PARTICLE_NUM 20000
+#define RANDOM_PARTICLES .1
 
 // Maximum error in normal angles to include a point
 #define MAX_NORMAL_DIFF 0.182 // 0.0872 = 5 degrees
@@ -39,11 +40,11 @@
 // #define DISCOUNT 10 // discounting factor f <- ??????????
 #define KONSTANT 800 // 2 * SIGMA^2 * f = .08
 
-// Keep best KEEP_RATIO percentage of particles
-#define KEEP_RATIO .1
-
-// Create NEW_SAMPS new samples based off of eac kept particle
-#define NEW_SAMPS 7
-
 
 #endif
+
+// Keep best KEEP_RATIO percentage of particles
+// #define KEEP_RATIO .1
+
+// Create NEW_SAMPS new samples based off of eac kept particle
+// #define NEW_SAMPS 7
