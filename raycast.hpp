@@ -114,8 +114,9 @@ vector<Line> AnalyticRayCast(PointXY x, vector<Line> map) {
     {
         Line currentLine = map[i];
 
-        // for(vector<Line>::size_type j = 0; j != map.size(); j++)
-        // while (j < map_size)
+        if (currentLine.isZero())
+            continue;
+
         for (int j = 0; j < map_size; j++)
         {
             if (j == i) { continue; }
@@ -123,17 +124,15 @@ vector<Line> AnalyticRayCast(PointXY x, vector<Line> map) {
             TrimOcclusion(x, currentLine, map[j], map);
         }
 
-        if (!currentLine.isZero()) 
-        {
-            int lsize = L.size();
+        if (currentLine.isZero())
+            continue;
 
-            // for(vector<Line>::size_type j = 0; j != L.size(); j++) {
-            for (int j = 0; j < lsize; j++) {
-                TrimOcclusion(x, L[j], currentLine, map);
-            }
-
-            L.push_back(currentLine);
+        int lsize = L.size();
+        for (int j = 0; j < lsize; j++) {
+            TrimOcclusion(x, L[j], currentLine, map);
         }
+
+        L.push_back(currentLine);
     }
 
     return L;
