@@ -34,7 +34,8 @@ PointXY convertNorm(PointXY p, float ang) {
     return newp;
 }
 
-void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointCloud<PointXY> normals, vector<Line> map)
+void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, 
+                 PointCloud<PointXY> normals, vector<Line> map)
 {
     int beliefsize = belief.size();
     svgPrint(map, -1, belief[0].getPos());
@@ -43,8 +44,13 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
     for (int i = 0; i < beliefsize; i++)
     // iterating through particles in belief to calculate p - belief index is i
     {
+        int pointsin = 0;
+        int pointsout = 0;
+
         vector<Line> raycastMap = AnalyticRayCast(belief[i].getPos(), map);
         int raycastmapsize = raycastMap.size();
+
+        svgPrint(raycastMap, i, belief[i].getPos());
         
         float obsLikelihood = 1.0;
 
@@ -60,7 +66,7 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
 
             PointXY intersection;
 
-            // int oldpointsin = pointsin;
+            int oldpointsin = pointsin;
 
             for (int k = 0; k < raycastmapsize; k++)
             // iterate through viewable lines raycasted map - line index is k
@@ -73,22 +79,34 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud, PointClou
                     // convert normal from robot-space to map-space
                     PointXY n = convertNorm(normals[j], belief[i].getAngle());
 
-                    // calculate angle between map-space point normal n (0, 0) to (<PointXY>) and wall normal (Line)
-                    
+                    // calculate angle between map-space point normal n 
+                    // (0, 0) to (<PointXY>) and wall normal (Line)
                     if (wall.angleAboveMax(n, MAX_NORMAL_DIFF)) {
                         float di2 = dst2dsqd(intersection, cloudpt);
                         obsLikelihood = obsLikelihood * exp(-di2/KONSTANT);
-                        // pointsin++;
+                        pointsin++;
+                    } else {
+                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
                     }
 
                     // found corresponding wall; break out of loop
                     break;
                 }
             }
+            if (pointsin == oldpointsin)
+                pointsout++;
+
         }
+        // print pointsin, pointsout, obsLikelihood
+        // pointsout should be low and only correspond to a few wall-less areas
+        cout << i << " Obs: " << obsLikelihood << " In: " << pointsin << " Out: " 
+        << pointsout << " Pos: " << belief[i].getPos().x << ", " 
+        << belief[i].getPos().y << " - " << belief[i].getAngle()  << endl;
 
         belief[i].setWeight(obsLikelihood);
-
         totalWeight += obsLikelihood;
     }
 

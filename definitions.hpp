@@ -28,11 +28,13 @@
 #define ANGLE_VARIANCE 0.17 // in rads = ~10 degrees
 #define DIST_VARIANCE 0.3 // in meters
 
-#define PARTICLE_NUM 20000
+// #define PARTICLE_NUM 20000
+#define PARTICLE_NUM 200
 #define RANDOM_PARTICLES .1
 
 // Maximum error in normal angles to include a point
-#define MAX_NORMAL_DIFF 0.182 // 0.0872 = 5 degrees
+#define MAX_NORMAL_DIFF 3.15 // 0.0872 = 5 degrees
+// #define MAX_NORMAL_DIFF 0.182 // 0.0872 = 5 degrees
 
 // **** CGR Constants
 

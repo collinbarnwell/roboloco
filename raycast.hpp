@@ -23,7 +23,9 @@ struct PointSorter {
 
 void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineList) {
     if (occluder.isZero()) return;
-    if (&occluder == &occludee) return;
+    if (occluder == occludee) {
+        cout << "**************************THIS HAPPENED" << endl;
+    }
 
     vector<PointXY> pois;
     PointXY intersection, poi1, poi2, ignore;
