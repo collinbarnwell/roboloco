@@ -31,6 +31,10 @@ PointXY convertNorm(PointXY p, float ang) {
     PointXY newp;
     newp.x = p.x * cos(ang) - p.y * sin(ang);
     newp.y = p.x * sin(ang) + p.y * cos(ang);
+    if (newp.x != newp.x) {
+        cout << ang << endl;
+        throw 2;
+    }
     return newp;
 }
 
@@ -71,6 +75,9 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud,
             for (int k = 0; k < raycastmapsize; k++)
             // iterate through viewable lines raycasted map - line index is k
             {
+                if (raycastMap[k].isZero())
+                    continue;
+
                 if (toCloudpt.intersectOutOfBound(raycastMap[k], intersection) || 
                     toCloudpt.intersect(raycastMap[k], intersection)) 
                 {
@@ -86,10 +93,11 @@ void CGRLocalize(vector<Particle> &belief, PointCloud<PointXYZ> cloud,
                         obsLikelihood = obsLikelihood * exp(-di2/KONSTANT);
                         pointsin++;
                     } else {
-                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
-                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
-                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
-                        cout << "!!!!!!!!!! EAUX NEAUX!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                        cout << "n:" << endl;
+                        cout << n.x << "," << n.y << endl;
+                        cout << "Wall:" << endl;
+                        wall.print();
+                        throw 1;
                     }
 
                     // found corresponding wall; break out of loop

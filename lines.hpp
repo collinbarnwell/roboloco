@@ -26,7 +26,6 @@ class Line {
         float lengthSqd();
         void checkLength();
         bool angleAboveMax(PointXY p, float max);
-        friend bool operator== (Line & l1, Line & l2 );
     private:
         PointXY start;
         PointXY end;
@@ -41,9 +40,20 @@ Line::Line(PointXY s, PointXY e) {
 }
 
 void Line::checkLength() {
+    // check to make sure not too small
     if (lengthSqd() <= .01*.01) {
         is_zero = true;
     }
+
+    // check to make sure its not vertical
+    if (end.x != end.x || start.x != start.x 
+        || end.y != end.y || start.y != start.y) {
+        cout << "dis shit be nan!!" << endl;
+        throw 1;
+    }
+
+    if (start.x == end.x)
+        end.x += .001;
 }
 
 bool Line::angleAboveMax(PointXY p, float max) {
@@ -104,17 +114,6 @@ bool Line::isZero() {
 
 void Line::set_to_zero() {
     is_zero = true;
-}
-
-bool operator== (Line & l1, Line & l2 )
-{
-    if (veryCloseTo( l1.getStart().x, l2.getStart().x ) && 
-        veryCloseTo( l1.getStart().y, l2.getStart().y ) &&
-        veryCloseTo( l1.getEnd().x, l2.getEnd().y ) &&
-        veryCloseTo( l1.getEnd().x, l2.getEnd().y ) )
-        return true;
-    else
-        return false;
 }
 
 bool Line::intersect(Line l, PointXY &intersection) 
@@ -189,7 +188,7 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
     float t = crossp( pq, s ) / rxs;
     float u = crossp( pq, r ) / rxs;
 
-    // behind start or within segment || outside of s
+    // behind start or not within segment || outside of s
     if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
         return false;
 
