@@ -32,6 +32,7 @@ PointXY convertNorm(PointXY p, float ang) {
     newp.x = p.x * cos(ang) - p.y * sin(ang);
     newp.y = p.x * sin(ang) + p.y * cos(ang);
     if (newp.x != newp.x) {
+        // this happened - normal returned by fspf must be vertical
         cout << ang << endl;
         throw 2;
     }

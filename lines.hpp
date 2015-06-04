@@ -51,9 +51,6 @@ void Line::checkLength() {
         cout << "dis shit be nan!!" << endl;
         throw 1;
     }
-
-    if (start.x == end.x)
-        end.x += .001;
 }
 
 bool Line::angleAboveMax(PointXY p, float max) {
@@ -67,6 +64,11 @@ bool Line::angleAboveMax(PointXY p, float max) {
 
     // dotp of normalized vectors
     float dotp = (lx*p.x + ly * p.y)/(lp*ll);
+
+    if (dotp != dotp) {
+        cout << "dotp is NaN in angleAboveMax" << endl;
+        throw 1;
+    }
     
     // range of ang is [0, Pi]
     float ang = acos(dotp);
@@ -147,8 +149,20 @@ bool Line::intersect(Line l, PointXY &intersection)
     if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
         return false;
 
+    if ( veryCloseTo(t, 1.0) || veryCloseTo(t, 0.0) ||
+        veryCloseTo(u, 0.0) || veryCloseTo(u, 1.0) )
+        return false;
+
     intersection.x = start.x + t*r.x;
     intersection.y = start.y + t*r.y;
+
+    if (u != u || t != t)
+        return false;
+
+    if (intersection.x != intersection.x || intersection.y != intersection.y) {
+        cout << "intersection be nan!" << endl;
+        throw 1;
+    }
 
     return true;
 }
@@ -192,8 +206,19 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
     if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
         return false;
 
+    if ( veryCloseTo(t, 1.0) || veryCloseTo(u, 1.0) || veryCloseTo(u, 0.0) )
+        return false;
+
     intersection.x = start.x + t*r.x;
     intersection.y = start.y + t*r.y;
+
+    if (u != u || t != t)
+        return false;
+
+    if (intersection.x != intersection.x || intersection.y != intersection.y) {
+        cout << "intersection be nan!" << endl;
+        throw 1;
+    }
 
     return true;
 }

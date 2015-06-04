@@ -36,6 +36,9 @@ float dotp(PointXYZ a, PointXYZ b) {
 
 Normal normalize(PointXYZ n) {
     float l = sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
+    if (l != l) {
+        cout << "normalize issue" << endl;
+    }
     return Normal(n.x/l, n.y/l, n.z/l);
 }
 

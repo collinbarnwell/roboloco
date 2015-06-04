@@ -38,9 +38,11 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
         return;
     }
 
-    if (occludee.intersect(occluder, intersection)) {
-        pois.push_back(intersection);
-    }
+    // if (occludee.intersect(occluder, intersection)) {
+    //     pois.push_back(intersection);
+    //     cout << "should not happen" << endl;
+    //     throw 1;
+    // }
     if (to_occluder_start.intersectOutOfBound(occludee, poi1)) {
         pois.push_back(poi1);
     }
@@ -111,8 +113,7 @@ vector<Line> AnalyticRayCast(PointXY x, vector<Line> map) {
     {
         Line currentLine = map[i];
 
-        if (currentLine.isZero())
-            continue;
+        if (currentLine.isZero()) { continue; }
 
         for (int j = 0; j < map_size; j++)
         {
@@ -121,8 +122,7 @@ vector<Line> AnalyticRayCast(PointXY x, vector<Line> map) {
             TrimOcclusion(x, currentLine, map[j], map);
         }
 
-        if (currentLine.isZero())
-            continue;
+        if (currentLine.isZero()) { continue; }
 
         int lsize = L.size();
         for (int j = 0; j < lsize; j++) {

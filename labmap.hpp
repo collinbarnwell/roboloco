@@ -25,7 +25,7 @@ vector<Line> makeMap() {
     map.push_back(createLine(0, .76, 0, 5.5));
     map.push_back(createLine(0, 5.5, .76, 5.5));
     map.push_back(createLine(.76, 5.5, .76, 7));
-    map.push_back(createLine(0, 7.6, 10.2, 7.6));
+    map.push_back(createLine(0, 7.6, 10.2, 7.6)); // top wall
     map.push_back(createLine(10.2, 7.6, 10.2, -1.5));
     map.push_back(createLine(10.2, -1.5, 7.5, -1.5));
     map.push_back(createLine(0, .76, 3.8, .76));
