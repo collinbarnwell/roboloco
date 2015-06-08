@@ -149,9 +149,9 @@ bool Line::intersect(Line l, PointXY &intersection)
     if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
         return false;
 
-    if ( veryCloseTo(t, 1.0) || veryCloseTo(t, 0.0) ||
-        veryCloseTo(u, 0.0) || veryCloseTo(u, 1.0) )
-        return false;
+    // if ( veryCloseTo(t, 1.0) || veryCloseTo(t, 0.0) ||
+    //     veryCloseTo(u, 0.0) || veryCloseTo(u, 1.0) )
+    //     return false;
 
     intersection.x = start.x + t*r.x;
     intersection.y = start.y + t*r.y;
@@ -206,14 +206,14 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
     if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
         return false;
 
-    if ( veryCloseTo(t, 1.0) || veryCloseTo(u, 1.0) || veryCloseTo(u, 0.0) )
+    // if ( veryCloseTo(t, 1.0) || veryCloseTo(u, 1.0) || veryCloseTo(u, 0.0) )
+    //     return false;
+
+    if (u != u || t != t)
         return false;
 
     intersection.x = start.x + t*r.x;
     intersection.y = start.y + t*r.y;
-
-    if (u != u || t != t)
-        return false;
 
     if (intersection.x != intersection.x || intersection.y != intersection.y) {
         cout << "intersection be nan!" << endl;
