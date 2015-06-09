@@ -75,11 +75,21 @@ void bubbleSort(vector<Particle> &arr) { // could do better
 }
 
 Particle randomParticle() {
-    PointXY pos;
-    pos.x = fmod(rand(), MAPMAXX);
-    pos.y = fmod(rand(), MAPMAXY);
+    while (true)
+    {
+        PointXY pos;
+        pos.x = fmod(rand(), MAPMAXX);
+        pos.y = fmod(rand(), MAPMAXY);
 
-    return Particle( pos, fmod(rand(),(2 * PI)) );
+        Particle p = Particle( pos, fmod(rand(),(2 * PI)) );
+        float curx = p.getPos().x;
+        float cury = p.getPos().y;
+        
+        if (curx >= MAPMAXX || curx <= 0 || cury >= MAPMAXY || cury <= 0 ||
+            (curx <= 3.8 && cury <= 1.5))
+            continue;
+        return p;
+    }
 }
 
 void checkBounds(vector<Particle> &belief) {
@@ -88,10 +98,11 @@ void checkBounds(vector<Particle> &belief) {
     {
         float curx = belief[i].getPos().x;
         float cury = belief[i].getPos().y;
-        if (curx > MAPMAXX || curx < 0 || cury > MAPMAXY || cury < 0) {
+        if (curx >= MAPMAXX || curx <= 0 || cury >= MAPMAXY || cury <= 0 ||
+            (curx <= 3.8 && cury <= 1.5))
+        {
             // if OB, replace wit random particle
             belief[i] = randomParticle();
-
             // belief.erase(belief.begin() + i);
         }
     }
