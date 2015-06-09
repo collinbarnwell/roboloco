@@ -20,9 +20,42 @@ struct PointSorter {
     PointXY p;
 };
 
+void addLinesICanSee(PointXY x, vector<Line> &L, vector<Line> lines)
+{
+        for (int i = 0; i != lines.size(); i++)
+        {
+            Line l = lines[i];
+
+            // find point half way between current and next
+            PointXY midpoint, ignore;
+            midpoint.x = (l.getStart().x + l.getEnd().x)/2.0;
+            midpoint.y = (l.getStart().y + l.getEnd().y)/2.0;
+            Line to_l = Line(x, midpoint);
+
+            bool keep = true;
+            for (int j = 0; j != L.size(); j++) 
+            {
+                PointXY ignore;
+                if ( to_l.intersect(L[j], ignore) ) {
+                    keep = false;
+                    break;
+                }
+            }
+            if (keep)
+                L.push_back(l);
+        }
+        
+        return;
+}
+
 
 void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineList) {
-    if (occluder.isZero()) return;
+    if (occludee.getStart().x == 0.0 && occludee.getStart().y == 0.76 
+        && occludee.getEnd().x == 0.0 && occludee.getEnd().y == 5.5)
+        cout << "trim occlusion is called !" << endl;
+
+    if (occluder.isZero() || occludee.isZero())
+        return;
 
     vector<PointXY> pois;
     PointXY poi1, poi2;
@@ -32,6 +65,7 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
 
     if (to_occluder_start.intersectOutOfBound(occludee, poi1))
         pois.push_back(poi1);
+
     if (to_occluder_end.intersectOutOfBound(occludee, poi2))
         pois.push_back(poi2);
 
@@ -59,7 +93,7 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
         midpoint.y = (current.y + next.y)/2.0;
         Line l = Line(x, midpoint);
 
-        if (first_keeper) 
+        if (first_keeper)
         {
             // check for occluder intersection in line to midpoint of occludee section
             if (l.intersect(occluder, ignore)) {
@@ -75,13 +109,16 @@ void TrimOcclusion(PointXY x, Line &occludee, Line occluder, vector<Line> &lineL
         } 
         else 
         {
-            if (!l.intersect(occluder, ignore))
+            if (!l.intersect(occluder, ignore)) {
                 lineList.push_back(Line(current, next));
+            }
             // else segment has already been trimmed, do nothing
         }
 
-        if (last_iteration)
+        if (last_iteration) {
+
             return;
+        }
 
         current = next;
         next = pois.back();
@@ -95,20 +132,79 @@ vector<Line> AnalyticRayCast(PointXY x, vector<Line> map)
     vector<Line> Lprime(map);
     vector<Line> L;
 
-    for (int i = 0; i < Lprime.size(); i++)
+    int same_count = 0;
+    int count = 0;
+    int prevsize = Lprime.size();
+    while (Lprime.size() > 0)
     {
-        Line li = Lprime[i];
+        count++;
+        // cout << "i: " << Lprime.size() <<"-";
+        Line li = Lprime.back();
+        Lprime.pop_back();
 
-        for (int j = 0; j < L.size(); j++) {
-            Line lj = L[j];
-            TrimOcclusion(x, li, lj, Lprime);
+        // hacky
+        // if (Lprime.size() > 0 && li == Lprime.front())
+        //     break;
+
+        if (Lprime.size() == prevsize)
+            same_count++;
+        else {
+            same_count = 0;
+            prevsize = Lprime.size();
         }
 
-        if (li.isZero()) { continue; }
+        if (same_count > 10 || count > 200) {
+            cout << "same_count: " << same_count << " count: " << count << endl;
+            cout << "! - " << L.size() << ", " << Lprime.size() << endl;
+            addLinesICanSee(x, L, Lprime);
+            cout << "IM HERE " << x.x << "," << x.y << endl;
+            return L;
+        }
 
-        for (int j = 0; j < L.size(); j++) {
+        int j = 0;
+        while (j < L.size()) 
+        {
             Line lj = L[j];
-            TrimOcclusion(x, lj, li, Lprime);
+
+            if (!(li == lj))
+                TrimOcclusion(x, li, lj, Lprime);
+            j++;
+        }
+
+        if (li.isZero())
+            continue;
+
+        j = 0;
+        while (j < Lprime.size())
+        {
+            Line lj = Lprime[j];
+
+            if (!(lj == li))
+                TrimOcclusion(x, li, lj, Lprime);
+            j++;
+        }
+
+        if (li.isZero())
+            continue;
+
+        // j = 0;
+        // while (true)
+        // {
+        //     if (j >= L.size())
+        //         break;
+
+        //     Line lj = L[j];
+        //     TrimOcclusion(x, lj, li, Lprime);
+        //     j++;
+        // }
+
+        // remove all zeroes
+        int i = 0;
+        while (i < Lprime.size()) {
+            if (Lprime[i].isZero())
+                Lprime.erase(Lprime.begin() + i);
+            else
+                i++;
         }
 
         L.push_back(li);

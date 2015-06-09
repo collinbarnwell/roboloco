@@ -33,6 +33,7 @@ PointXY convertNorm(PointXY p, float ang) {
     newp.y = p.x * sin(ang) + p.y * cos(ang);
     if (newp.x != newp.x) {
         // this happened - normal returned by fspf must be vertical
+        cout << "Error converting normal to mapspace" << endl;
         cout << ang << endl;
         throw 2;
     }

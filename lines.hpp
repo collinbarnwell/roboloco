@@ -26,11 +26,19 @@ class Line {
         float lengthSqd();
         void checkLength();
         bool angleAboveMax(PointXY p, float max);
+        friend bool operator==(Line l1, Line l2);
     private:
         PointXY start;
         PointXY end;
         bool is_zero;
 };
+
+bool operator==(Line l1, Line l2) {
+    if ((l1.start == l2.start && l1.end == l2.end) ||
+        (l1.start == l2.end && l1.end == l2.start))
+        return true;
+    return false;
+}
 
 Line::Line(PointXY s, PointXY e) {
     start = s;
@@ -41,11 +49,11 @@ Line::Line(PointXY s, PointXY e) {
 
 void Line::checkLength() {
     // check to make sure not too small
-    if (lengthSqd() <= .01*.01) {
-        is_zero = true;
-    }
+    // if (lengthSqd() <= .01*.01) {
+    //     is_zero = true;
+    // }
 
-    // check to make sure its not vertical
+    // // check to make sure its not vertical
     if (end.x != end.x || start.x != start.x 
         || end.y != end.y || start.y != start.y) {
         cout << "dis shit be nan!!" << endl;
@@ -120,7 +128,11 @@ void Line::set_to_zero() {
 
 bool Line::intersect(Line l, PointXY &intersection) 
 {
-    PointXY s, r, pq;
+    // p is self start
+    // q is l start
+    // s is q end - q start
+    // r is p end - p start
+    PointXY s, r, qminusp;
     s.x = l.getEnd().x - l.getStart().x;
     s.y = l.getEnd().y - l.getStart().y;
 
@@ -129,8 +141,8 @@ bool Line::intersect(Line l, PointXY &intersection)
 
     // t = (l.getStart() − start) × s / (r × s)
     // u = (l.getStart() − start) × r / (r × s)
-    pq.x = l.getStart().x - start.x;
-    pq.y = l.getStart().y - start.y;
+    qminusp.x = l.getStart().x - start.x;
+    qminusp.y = l.getStart().y - start.y;
 
     float rxs = crossp( r, s );
 
@@ -142,12 +154,13 @@ bool Line::intersect(Line l, PointXY &intersection)
         return false;
     }
 
-    float t = crossp( pq, s ) / rxs;
-    float u = crossp( pq, r ) / rxs;
+    float t = crossp( qminusp, s ) / rxs;
+    float u = crossp( qminusp, r ) / rxs;
 
     // behind start or within segment || outside of s
-    if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 )
+    if ( t > 1.0 || t < 0.0 || u > 1.0 || u < 0.0 ) {
         return false;
+    }
 
     // if ( veryCloseTo(t, 1.0) || veryCloseTo(t, 0.0) ||
     //     veryCloseTo(u, 0.0) || veryCloseTo(u, 1.0) )
@@ -177,7 +190,7 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
 // Tests if intersects with l, even if intersection is outside of self
 {
     // want to find t & u for: (p)start + t*<r> = (q)l.getStart() + u*<s>
-    PointXY s, r, pq;
+    PointXY s, r, qminusp;
     s.x = l.getEnd().x - l.getStart().x;
     s.y = l.getEnd().y - l.getStart().y;
 
@@ -186,8 +199,8 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
 
     // t = (l.getStart() − start) × s / (r × s)
     // u = (l.getStart() − start) × r / (r × s)
-    pq.x = l.getStart().x - start.x;
-    pq.y = l.getStart().y - start.y;
+    qminusp.x = l.getStart().x - start.x;
+    qminusp.y = l.getStart().y - start.y;
 
     float rxs = crossp( r, s );
 
@@ -199,18 +212,22 @@ bool Line::intersectOutOfBound(Line l, PointXY &intersection)
         return false;
     }
 
-    float t = crossp( pq, s ) / rxs;
-    float u = crossp( pq, r ) / rxs;
+    float t = crossp( qminusp, s ) / rxs;
+    float u = crossp( qminusp, r ) / rxs;
 
     // behind start or not within segment || outside of s
-    if ( t <= 1.0 || u >= 1.0 || u <= 0.0 )
+
+    if ( t <= 1.0 || u >= 1.0 || u <= 0.0 ) {
         return false;
+    }
 
     // if ( veryCloseTo(t, 1.0) || veryCloseTo(u, 1.0) || veryCloseTo(u, 0.0) )
     //     return false;
 
-    if (u != u || t != t)
+    if (u != u || t != t) {
+        // cout << "NAN" << endl;
         return false;
+    }
 
     intersection.x = start.x + t*r.x;
     intersection.y = start.y + t*r.y;

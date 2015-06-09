@@ -82,5 +82,10 @@ PointXY projectNorm(Normal n) {
     return p;
 }
 
+bool operator==(PointXY a, PointXY b) {
+    if (veryCloseTo(a.x, b.x) && veryCloseTo(a.y, b.y))
+        return true;
+    return false;
+}
 
 #endif
